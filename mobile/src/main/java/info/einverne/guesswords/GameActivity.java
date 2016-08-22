@@ -8,12 +8,21 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import info.einverne.guesswords.data.SingleWord;
 import info.einverne.guesswords.data.WordsManager;
 import info.einverne.guesswords.detector.ScreenFaceDetector;
+import timber.log.Timber;
 
 public class GameActivity extends AppCompatActivity implements ScreenFaceDetector.Listener {
     public static final String GROUP_ID = "GROUP_ID";
@@ -31,7 +40,10 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
     private Timer timerCountDown;
     private TimerTask timerTaskCountDown;
     private int nLeftTime = 90;
-    private WordsManager wordsManager;
+
+    private String groupId;
+    private FirebaseDatabase database;
+    List<SingleWord> words = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,15 +52,37 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game);
-        wordsManager = new WordsManager(this);
-        wordsManager.init();
-        String groupId = getIntent().getStringExtra(GROUP_ID);
-        List<String> words = wordsManager.getWords(groupId);
+
+        database = FirebaseDatabase.getInstance();
+
+        groupId = getIntent().getStringExtra(GROUP_ID);
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         initSensor();
         initUI();
+        getWords();
     }
+
+    public void getWords() {
+        final DatabaseReference databaseReference = database.getReference("zh").child(groupId);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot shot : dataSnapshot.getChildren()) {
+                    words.add(shot.getValue(SingleWord.class));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Timber.w(databaseError.toException(), "getWords onCancelled");
+            }
+        });
+    }
+
+    public void addNewItem(String groupId, String guessWord) {
+    }
+
 
     private void initUI() {
         tv_guessing_word = (TextView) findViewById(R.id.tv_guessing_word);

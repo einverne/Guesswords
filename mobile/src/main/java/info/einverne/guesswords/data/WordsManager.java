@@ -60,7 +60,7 @@ public class WordsManager {
 
 
         writeNewWord("character", "1", "oneword", "word description");
-        getWords("1");
+
         List<Group> list = getAllGroup();
         for (Group oneGroup : list) {
             Timber.d("map key: " + oneGroup.groupId + "value: " + oneGroup.groupName);
@@ -162,25 +162,4 @@ public class WordsManager {
         database.getReference("zh").child(groupId).child(wordId).setValue(singleWord);
     }
 
-    public List<String> getWords(String groupId) {
-        final List<String> words = new ArrayList<>();
-        final DatabaseReference databaseReference = database.getReference("zh").child(groupId);
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot shot : dataSnapshot.getChildren()) {
-                    words.add((String) shot.getValue());
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Timber.w(databaseError.toException(), "getWords onCancelled");
-            }
-        });
-        return words;
-    }
-
-    public void addNewItem(String groupId, String guessWord) {
-    }
 }
