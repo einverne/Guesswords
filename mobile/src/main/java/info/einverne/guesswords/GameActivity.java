@@ -8,12 +8,15 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import info.einverne.guesswords.data.WordsManager;
 import info.einverne.guesswords.detector.ScreenFaceDetector;
 
 public class GameActivity extends AppCompatActivity implements ScreenFaceDetector.Listener {
+    public static final String GROUP_ID = "GROUP_ID";
     private SensorManager sensorManager;
     private ScreenFaceDetector screenFaceDetector;
 
@@ -28,6 +31,7 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
     private Timer timerCountDown;
     private TimerTask timerTaskCountDown;
     private int nLeftTime = 90;
+    private WordsManager wordsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,10 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game);
+        wordsManager = new WordsManager(this);
+        String groupId = getIntent().getStringExtra(GROUP_ID);
+        List<String> words = wordsManager.getWords(groupId);
+
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         initSensor();
         initUI();

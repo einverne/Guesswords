@@ -15,6 +15,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.games.Game;
+
+import info.einverne.guesswords.data.WordsManager;
 import info.einverne.guesswords.detector.ScreenFaceDetector;
 
 public class MainActivity extends AppCompatActivity
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 Intent intent = new Intent(MainActivity.this, GameActivity.class);
+                intent.putExtra(GameActivity.GROUP_ID, "characters");
                 startActivity(intent);
             }
         });
@@ -48,6 +52,8 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        WordsManager wordsManager = new WordsManager(this);
+        wordsManager.init();
     }
 
     @Override

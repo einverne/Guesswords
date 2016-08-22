@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "922471078258",
+    "firebase_url": "https://evguesswords.firebaseio.com",
+    "project_id": "evguesswords",
+    "storage_bucket": "evguesswords.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:922471078258:android:d586cdf5298a98f7",
+        "android_client_info": {
+          "package_name": "info.einverne.guesswords"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "922471078258-snd7qm3fu108m5vjhnhqit4mdl0om09n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "info.einverne.guesswords",
+            "certificate_hash": "826731C31ED58B9704BA85ADC61354A340F9DB90"
+          }
+        },
+        {
+          "client_id": "922471078258-bjfc8s6kis3iik0jsoq81ukj76cce43t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3Bpj8O7AUxJiUi-8sZZUYuIh2JZ4zAAo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "922471078258-bjfc8s6kis3iik0jsoq81ukj76cce43t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
