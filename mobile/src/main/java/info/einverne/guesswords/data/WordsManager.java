@@ -12,8 +12,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import timber.log.Timber;
@@ -42,6 +40,8 @@ public class WordsManager {
         characters.add("Beel");
         database.getReference("zh").child("1").setValue(characters);
 
+
+
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -57,15 +57,21 @@ public class WordsManager {
                 Timber.w(databaseError.toException(), "Failed to read value.");
             }
         });
-        createGroup("Movies", "Movie To Display");
+
 
         writeNewWord("character", "1", "oneword", "word description");
         getWords("1");
-        HashMap<String, String> map = getAllGroup();
-        for (String key : map.keySet()) {
-            Timber.d("map key: " + key + "value: " + map.get(key));
+        List<Group> list = getAllGroup();
+        for (Group oneGroup : list) {
+            Timber.d("map key: " + oneGroup.groupId + "value: " + oneGroup.groupName);
         }
 
+        createGroup("ID", "content");
+
+    }
+
+    public DatabaseReference getGroupRef() {
+        return database.getReference("zh").child("groups");
     }
 
     public String ReadFromfile(String fileName) {
@@ -100,15 +106,14 @@ public class WordsManager {
     }
 
 
-    public HashMap<String, String> getAllGroup() {
-        final HashMap<String, String> ret = new HashMap<>();
+    public List<Group> getAllGroup() {
+        final List<Group> ret = new ArrayList<>();
         DatabaseReference groupRef = database.getReference("zh").child("groups");
         groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot shot : dataSnapshot.getChildren()) {
-                    ret.put(shot.getKey(), (String) shot.getValue());
-                }
+
+
             }
 
             @Override
@@ -130,9 +135,16 @@ public class WordsManager {
         groupsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.hasChild(groupId)) {
+                List<String> listGroup = new ArrayList<String>();
+                Group group = new Group(groupId, groupDetail);
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    Group oneGroup = data.getValue(Group.class);
+                    listGroup.add(oneGroup.groupId);
+                }
+                if (!listGroup.contains(groupId)) {
                     Timber.d("group not exsit");
-                    groupsRef.child(groupId).setValue(groupDetail);
+                    String groupKey = groupsRef.push().getKey();
+                    groupsRef.child(groupKey).setValue(group);
                 } else {
                     Timber.d("group exist");
                 }

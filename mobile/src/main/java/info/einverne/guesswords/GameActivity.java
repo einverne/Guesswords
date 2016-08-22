@@ -41,6 +41,7 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game);
         wordsManager = new WordsManager(this);
+        wordsManager.init();
         String groupId = getIntent().getStringExtra(GROUP_ID);
         List<String> words = wordsManager.getWords(groupId);
 

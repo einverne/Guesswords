@@ -1,28 +1,38 @@
 package info.einverne.guesswords;
 
 import android.content.Intent;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
-import com.google.android.gms.games.Game;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.Map;
+
+import info.einverne.guesswords.data.Group;
 import info.einverne.guesswords.data.WordsManager;
-import info.einverne.guesswords.detector.ScreenFaceDetector;
+import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private RecyclerView mRecyclerView;
+    private Map<String, String> groupsMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +61,62 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
         WordsManager wordsManager = new WordsManager(this);
         wordsManager.init();
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+
+        FirebaseRecyclerAdapter<Group, GroupViewHolder> adapter =
+                new FirebaseRecyclerAdapter<Group, GroupViewHolder>(
+                        Group.class,
+                        R.layout.list_item,
+                        GroupViewHolder.class,
+                        wordsManager.getGroupRef()
+                ) {
+                    @Override
+                    protected void populateViewHolder(GroupViewHolder viewHolder, final Group oneGroup, final int position) {
+                        viewHolder.mTextView.setText(oneGroup.groupName);
+                        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Timber.d("GroupViewHolder " + oneGroup.groupId + " " + oneGroup.groupName);
+
+                                startGame(oneGroup.groupId);
+                            }
+                        });
+                    }
+                };
+        mRecyclerView.setAdapter(adapter);
+
+        wordsManager.getGroupRef().addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void startGame(String groupId) {
+        Intent intent = new Intent(MainActivity.this, GameActivity.class);
+        intent.putExtra(GameActivity.GROUP_ID, groupId);
+        startActivity(intent);
+    }
+
+    public static class GroupViewHolder extends RecyclerView.ViewHolder {
+        TextView mTextView;
+
+        public GroupViewHolder(View itemView) {
+            super(itemView);
+            mTextView = (TextView) itemView.findViewById(R.id.groupName);
+
+        }
     }
 
     @Override
