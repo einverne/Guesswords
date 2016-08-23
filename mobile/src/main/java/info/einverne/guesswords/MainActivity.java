@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -26,13 +29,19 @@ import java.util.Map;
 
 import info.einverne.guesswords.data.Group;
 import info.einverne.guesswords.data.WordsManager;
+import info.einverne.guesswords.fragment.GameHistroyFragment;
+import info.einverne.guesswords.fragment.GroupFragment;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private RecyclerView mRecyclerView;
     private Map<String, String> groupsMap;
+    private DrawerLayout drawer;
+    private ImageView imageViewAvatar;
+    private FragmentManager fragmentManager;
+    private GroupFragment groupFragment;
+    private Fragment histroyFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +49,15 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        fragmentManager = getSupportFragmentManager();
+
+        groupFragment = GroupFragment.newInstance();
+        histroyFragment = GameHistroyFragment.newInstance("param1", "param2");
+
+        fragmentManager.beginTransaction()
+                .add(R.id.frame_content, groupFragment)
+                .commit();
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -53,7 +71,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -61,67 +79,29 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        WordsManager wordsManager = new WordsManager(this);
-        wordsManager.init();
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-
-        FirebaseRecyclerAdapter<Group, GroupViewHolder> adapter =
-                new FirebaseRecyclerAdapter<Group, GroupViewHolder>(
-                        Group.class,
-                        R.layout.list_item,
-                        GroupViewHolder.class,
-                        wordsManager.getGroupRef()
-                ) {
-                    @Override
-                    protected void populateViewHolder(GroupViewHolder viewHolder, final Group oneGroup, final int position) {
-                        viewHolder.mTextView.setText(oneGroup.groupName);
-                        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Timber.d("GroupViewHolder " + oneGroup.groupId + " " + oneGroup.groupName);
-
-                                startGame(oneGroup.groupId);
-                            }
-                        });
-                    }
-                };
-        mRecyclerView.setAdapter(adapter);
-
-        wordsManager.getGroupRef().addValueEventListener(new ValueEventListener() {
+        View navHeader = navigationView.getHeaderView(0);
+        navHeader.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
+            public void onClick(View view) {
+                Timber.d("Clicked on nav header");
             }
         });
+        imageViewAvatar = (ImageView) navHeader.findViewById(R.id.imageViewAvatar);
+        imageViewAvatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            }
+        });
+
+
+
+
     }
 
-    private void startGame(String groupId) {
-        Intent intent = new Intent(MainActivity.this, GameActivity.class);
-        intent.putExtra(GameActivity.GROUP_ID, groupId);
-        startActivity(intent);
-    }
-
-    public static class GroupViewHolder extends RecyclerView.ViewHolder {
-        TextView mTextView;
-
-        public GroupViewHolder(View itemView) {
-            super(itemView);
-            mTextView = (TextView) itemView.findViewById(R.id.groupName);
-
-        }
-    }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -157,21 +137,23 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_game_groups) {
+            fragmentManager.beginTransaction()
+                    .add(R.id.frame_content, groupFragment)
+                    .commit();
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_game_histroy) {
+            fragmentManager.beginTransaction()
+                    .replace(R.id.frame_content, histroyFragment)
+                    .commit();
+        } else if (id == R.id.nav_my_words) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_setting) {
 
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_about) {
 
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

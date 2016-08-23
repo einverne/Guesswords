@@ -66,8 +66,6 @@ public class WordsManager {
             Timber.d("map key: " + oneGroup.groupId + "value: " + oneGroup.groupName);
         }
 
-        createGroup("ID", "content");
-
     }
 
     public DatabaseReference getGroupRef() {
@@ -127,7 +125,7 @@ public class WordsManager {
     /**
      * create one group, if not exist
      *
-     * @param groupId     key to group
+     * @param groupId     key to group, use this key to retrieve group words
      * @param groupDetail the name of group, may be different according to language
      */
     public void createGroup(final String groupId, final String groupDetail) {
