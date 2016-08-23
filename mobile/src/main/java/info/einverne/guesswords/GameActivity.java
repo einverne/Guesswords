@@ -2,7 +2,6 @@ package info.einverne.guesswords;
 
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
@@ -20,7 +19,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import info.einverne.guesswords.data.SingleWord;
-import info.einverne.guesswords.data.WordsManager;
 import info.einverne.guesswords.detector.ScreenFaceDetector;
 import timber.log.Timber;
 
@@ -44,6 +42,7 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
     private String groupId;
     private FirebaseDatabase database;
     List<SingleWord> words = new ArrayList<>();
+    private int index = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +60,8 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
         initSensor();
         initUI();
         getWords();
+
+
     }
 
     public void getWords() {
@@ -107,7 +108,7 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
                         nPrepareTime--;
                         if (nPrepareTime < 0) {
                             timerPrepare.cancel();
-                            tv_guessing_word.setText("Word");
+                            isReady = true;
                             startCountDown();
                         }
                     }
@@ -129,7 +130,7 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
                         nLeftTime--;
                         if (nLeftTime < 0) {
                             timerCountDown.cancel();
-                            
+
                         }
                     }
                 });
@@ -163,12 +164,18 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
 
     @Override
     public void FaceUp() {
-
+        if (!isReady) return;
+        if (index >= words.size()) return;
+        tv_guessing_word.setText(words.get(index).wordString);
+        index++;
     }
 
     @Override
     public void FaceDown() {
-
+        if (!isReady) return;
+        if (index >= words.size()) return;
+        tv_guessing_word.setText(words.get(index).wordString);
+        index++;
     }
 
 
