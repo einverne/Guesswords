@@ -72,6 +72,17 @@
                 android:text="@string/action_sign_in"
                 android:textStyle="bold" />
 
+            <Button
+                android:id="@+id/btn_anonymous_login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="anonymous login" />
+
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/btn_sign_in_google"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
