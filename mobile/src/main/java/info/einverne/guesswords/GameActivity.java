@@ -14,8 +14,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -37,17 +38,18 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
 
     private Timer timerPrepare;
     private TimerTask timerTaskPrepare;
-    private int nPrepareTime = 5;
+    private int nPrepareTime = 2;
 
     private Timer timerCountDown;
     private TimerTask timerTaskCountDown;
-    private int nLeftTime = 90;
+    private int nLeftTime = 10;
 
     private String groupId;
     private FirebaseDatabase database;
-    List<SingleWord> words = new ArrayList<>();
     List<SingleWord> randomWords = new ArrayList<>();
     private int index = 0;
+
+    private Map<String, Boolean> gameRecord = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,13 +80,12 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Timber.d("GameActivity data change");
+                List<SingleWord> words = new ArrayList<>();
                 for (DataSnapshot shot : dataSnapshot.getChildren()) {
                     words.add(shot.getValue(SingleWord.class));
-                    for (int i = 0; i < 90; i++) {
-                        randomWords.add(words.get(new Random().nextInt(words.size())));
-                    }
-
-
+                }
+                for (int i = 0; i < 90; i++) {
+                    randomWords.add(words.get(new Random().nextInt(words.size())));
                 }
             }
 
@@ -120,6 +121,8 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
                             timerPrepare.cancel();
                             isReady = true;
                             startCountDown();
+                            if (randomWords.size() <= 0) return;
+                            tv_guessing_word.setText(randomWords.get(index).wordString);
                         }
                     }
                 });
@@ -140,8 +143,7 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
                         nLeftTime--;
                         if (nLeftTime < 0) {
                             timerCountDown.cancel();
-                            if (words.size() <= 0) return;
-                            tv_guessing_word.setText(words.get(index).wordString);
+                            gameOver();
                         }
                     }
                 });
@@ -150,21 +152,27 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
         timerCountDown.schedule(timerTaskCountDown, 0, 1000);
     }
 
+    private void gameOver() {
+        String key = database.getReference("zh").child("histroy").push().getKey();
+        database.getReference("zh").child("histroy").child(key).setValue(gameRecord);
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
         screenFaceDetector.stop();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
         if (timerPrepare != null) {
             timerPrepare.cancel();
         }
         if (timerCountDown != null) {
             timerCountDown.cancel();
         }
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
     @Override
@@ -183,20 +191,22 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
 
     @Override
     public void FaceUp() {
+        Timber.d("FaceUp");
         if (!isReady) return;
-        if (index >= words.size()) return;
-        tv_guessing_word.setText(words.get(index).wordString);
+        if (index >= randomWords.size()) return;
+        gameRecord.put(randomWords.get(index).wordString, false);
         index++;
+        tv_guessing_word.setText(randomWords.get(index).wordString);
     }
 
     @Override
     public void FaceDown() {
         if (!isReady) return;
-        if (index >= words.size()) return;
-        tv_guessing_word.setText(words.get(index).wordString);
+        if (index >= randomWords.size()) return;
+        gameRecord.put(randomWords.get(index).wordString, true);
         index++;
+        tv_guessing_word.setText(randomWords.get(index).wordString);
     }
-
 
     private void initSensor() {
         if (screenFaceDetector == null) {
