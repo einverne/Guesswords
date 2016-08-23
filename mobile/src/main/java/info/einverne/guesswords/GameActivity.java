@@ -26,9 +26,11 @@ import timber.log.Timber;
 
 public class GameActivity extends AppCompatActivity implements ScreenFaceDetector.Listener {
     public static final String GROUP_ID = "GROUP_ID";
+    private static final String STATE_INDEX = "STATE_INDEX";
     private SensorManager sensorManager;
     private ScreenFaceDetector screenFaceDetector;
 
+    private boolean isSync = false;
     private boolean isReady = false;
     private TextView tv_guessing_word;
     private TextView tv_game_left_time;
@@ -44,6 +46,7 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
     private String groupId;
     private FirebaseDatabase database;
     List<SingleWord> words = new ArrayList<>();
+    List<SingleWord> randomWords = new ArrayList<>();
     private int index = 0;
 
     @Override
@@ -63,16 +66,25 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
         initUI();
         getWords();
 
-
+        if (savedInstanceState != null) {
+            index = savedInstanceState.getInt(STATE_INDEX);
+        }
     }
 
     public void getWords() {
+        Timber.d("groupId " + groupId);
         final DatabaseReference databaseReference = database.getReference("zh").child(groupId);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Timber.d("GameActivity data change");
                 for (DataSnapshot shot : dataSnapshot.getChildren()) {
                     words.add(shot.getValue(SingleWord.class));
+                    for (int i = 0; i < 90; i++) {
+                        randomWords.add(words.get(new Random().nextInt(words.size())));
+                    }
+
+
                 }
             }
 
@@ -81,13 +93,7 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
                 Timber.w(databaseError.toException(), "getWords onCancelled");
             }
         });
-        long seed = System.nanoTime();
-        Collections.shuffle(words, new Random(seed));
     }
-
-    public void addNewItem(String groupId, String guessWord) {
-    }
-
 
     private void initUI() {
         tv_guessing_word = (TextView) findViewById(R.id.tv_guessing_word);
@@ -165,6 +171,14 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
     protected void onResume() {
         super.onResume();
         initSensor();
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_INDEX, index);
+
     }
 
     @Override

@@ -13,8 +13,6 @@ import info.einverne.guesswords.R;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link GameHistroyFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
  * Use the {@link GameHistroyFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
@@ -62,8 +60,10 @@ public class GameHistroyFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_game_histroy, container, false);
+        View view = inflater.inflate(R.layout.fragment_game_histroy, container, false);
+
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
