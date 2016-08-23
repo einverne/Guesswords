@@ -14,13 +14,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import info.einverne.guesswords.GameActivity;
-import info.einverne.guesswords.MainActivity;
 import info.einverne.guesswords.R;
+import info.einverne.guesswords.data.FirebaseDatabaseConstant;
 import info.einverne.guesswords.data.Group;
-import info.einverne.guesswords.data.WordsManager;
 import timber.log.Timber;
 
 /**
@@ -76,6 +76,9 @@ public class GroupFragment extends Fragment {
 
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         database = FirebaseDatabase.getInstance();
+        DatabaseReference groupRef = database
+                .getReference(FirebaseDatabaseConstant.CHINESE_DATABASE)
+                .child(FirebaseDatabaseConstant.GROUP_KEY);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
@@ -86,7 +89,7 @@ public class GroupFragment extends Fragment {
                         Group.class,
                         R.layout.list_item,
                         GroupViewHolder.class,
-                        database.getReference("zh").child("groups")
+                        groupRef
                 ) {
                     @Override
                     protected void populateViewHolder(GroupViewHolder viewHolder, final Group oneGroup, final int position) {
@@ -102,7 +105,6 @@ public class GroupFragment extends Fragment {
                     }
                 };
         mRecyclerView.setAdapter(adapter);
-
 
         return view;
     }

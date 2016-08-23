@@ -33,7 +33,6 @@ public class WordsManager {
         database.setPersistenceEnabled(true);           // Disk Persistence enabled
         DatabaseReference databaseReference = database.getReference("message");
 
-        databaseReference.setValue("Hello，, World");
 
         List<String> characters = new ArrayList<>();
         characters.add("Angel");
