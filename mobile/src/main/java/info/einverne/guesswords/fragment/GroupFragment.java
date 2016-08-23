@@ -74,7 +74,6 @@ public class GroupFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.app_bar_main, container, false);
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         database = FirebaseDatabase.getInstance();
         DatabaseReference groupRef = database
                 .getReference(FirebaseDatabaseConstant.CHINESE_DATABASE)
