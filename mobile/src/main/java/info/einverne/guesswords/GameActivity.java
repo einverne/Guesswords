@@ -14,7 +14,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -79,6 +81,8 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
                 Timber.w(databaseError.toException(), "getWords onCancelled");
             }
         });
+        long seed = System.nanoTime();
+        Collections.shuffle(words, new Random(seed));
     }
 
     public void addNewItem(String groupId, String guessWord) {
