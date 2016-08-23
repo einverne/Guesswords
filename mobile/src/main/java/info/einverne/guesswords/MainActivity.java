@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_game_groups) {
             fragmentManager.beginTransaction()
-                    .add(R.id.frame_content, groupFragment)
+                    .replace(R.id.frame_content, groupFragment)
                     .commit();
 
         } else if (id == R.id.nav_game_histroy) {
