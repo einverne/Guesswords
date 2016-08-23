@@ -130,7 +130,8 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
                         nLeftTime--;
                         if (nLeftTime < 0) {
                             timerCountDown.cancel();
-
+                            if (words.size() <= 0) return;
+                            tv_guessing_word.setText(words.get(index).wordString);
                         }
                     }
                 });
