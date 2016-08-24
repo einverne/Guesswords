@@ -115,9 +115,15 @@ public class MainActivity extends BaseActivity
                 }
             });
             TextView user_name = (TextView) navHeader.findViewById(R.id.user_name);
-            user_name.setText(user.getDisplayName());
             TextView user_email = (TextView) navHeader.findViewById(R.id.user_email);
-            user_email.setText(user.getEmail());
+            Timber.d("user isAnonymous " + user.isAnonymous());
+            if (user.isAnonymous()) {
+                user_name.setText("Anonymous");
+                user_email.setText("email");
+            } else {
+                user_name.setText(user.getDisplayName());
+                user_email.setText(user.getEmail());
+            }
         } else {
             view_before_login.setVisibility(View.VISIBLE);
             view_after_login.setVisibility(View.GONE);
