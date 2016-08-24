@@ -15,41 +15,55 @@
         android:id="@+id/imageViewAvatar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/nav_header_vertical_spacing"
+        android:padding="8dp"
         android:src="@android:drawable/sym_def_app_icon" />
 
     <LinearLayout
+        android:id="@+id/nav_header_before_login"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:visibility="gone">
 
         <TextView
-            android:id="@+id/nav_header_before_login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Click avatar to login"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/nav_header_after_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:orientation="horizontal"
+        android:visibility="visible">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/nav_header_vertical_spacing"
-            android:text="Android Studio"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-
-        <TextView
-            android:id="@+id/textView"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="android.studio@android.com" />
+            android:orientation="vertical">
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/user_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Android Studio"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+            <TextView
+                android:id="@+id/user_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="android.studio@android.com" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/nv_header_log_out"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:text="logout" />
+    </RelativeLayout>
 
 </LinearLayout>

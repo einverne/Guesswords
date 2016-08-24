@@ -14,7 +14,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Map;
 
@@ -25,12 +29,20 @@ import timber.log.Timber;
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private Map<String, String> groupsMap;
+    // UI
+    private NavigationView navigationView;
     private DrawerLayout drawer;
+    private View navHeader;
+    private View view_before_login;
+    private View view_after_login;
     private ImageView imageViewAvatar;
+
+    // fragment
     private FragmentManager fragmentManager;
     private GroupFragment groupFragment;
     private Fragment histroyFragment;
+
+    private Map<String, String> groupsMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,26 +78,64 @@ public class MainActivity extends BaseActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        View navHeader = navigationView.getHeaderView(0);
+        navHeader = navigationView.getHeaderView(0);
+
+        view_before_login = navHeader.findViewById(R.id.nav_header_before_login);
+        view_after_login = navHeader.findViewById(R.id.nav_header_after_login);
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Timber.d("MainActivity onStart");
+        updateSignUI();
+    }
+
+    private void updateSignUI() {
         navHeader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Timber.d("Clicked on nav header");
             }
         });
-        imageViewAvatar = (ImageView) navHeader.findViewById(R.id.imageViewAvatar);
-        imageViewAvatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            }
-        });
-
-
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            view_before_login.setVisibility(View.GONE);
+            view_after_login.setVisibility(View.VISIBLE);
+            Button btnLogout = (Button) navHeader.findViewById(R.id.nv_header_log_out);
+            btnLogout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Timber.d("logout");
+                    mAuth.signOut();
+                    updateSignUI();
+                }
+            });
+            TextView user_name = (TextView) navHeader.findViewById(R.id.user_name);
+            user_name.setText(user.getDisplayName());
+            TextView user_email = (TextView) navHeader.findViewById(R.id.user_email);
+            user_email.setText(user.getEmail());
+        } else {
+            view_before_login.setVisibility(View.VISIBLE);
+            view_after_login.setVisibility(View.GONE);
+            imageViewAvatar = (ImageView) navHeader.findViewById(R.id.imageViewAvatar);
+            imageViewAvatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                }
+            });
+        }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Timber.d("onResume");
+    }
 
     @Override
     public void onBackPressed() {

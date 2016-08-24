@@ -17,6 +17,8 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -86,6 +88,11 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_login);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -110,6 +117,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
             }
         });
 
+        // anonymous login
         Button anonymousButton = (Button) findViewById(R.id.btn_anonymous_login);
         anonymousButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -131,6 +139,8 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                                     Timber.w(task.getException(), "signInAnonymously");
                                     Toast.makeText(LoginActivity.this, "Authentication failed.",
                                             Toast.LENGTH_SHORT).show();
+                                } else {
+                                    finish();
                                 }
                             }
                         });
@@ -417,9 +427,11 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
+            finish();
 //            mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
 //            updateUI(true);
         } else {
+            Toast.makeText(LoginActivity.this, "Login failed, try again later", Toast.LENGTH_SHORT).show();
             // Signed out, show unauthenticated UI.
 //            updateUI(false);
         }
