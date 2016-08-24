@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Map;
@@ -101,7 +102,7 @@ public class MainActivity extends BaseActivity
                 Timber.d("Clicked on nav header");
             }
         });
-        FirebaseUser user = mAuth.getCurrentUser();
+        final FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             view_before_login.setVisibility(View.GONE);
             view_after_login.setVisibility(View.VISIBLE);
@@ -110,8 +111,13 @@ public class MainActivity extends BaseActivity
                 @Override
                 public void onClick(View view) {
                     Timber.d("logout");
-                    mAuth.signOut();
+                    if (user.isAnonymous()) {
+                        mAuth.signOut();
+                    } else {
+                        FirebaseAuth.getInstance().signOut();
+                    }
                     updateSignUI();
+
                 }
             });
             TextView user_name = (TextView) navHeader.findViewById(R.id.user_name);
@@ -119,7 +125,7 @@ public class MainActivity extends BaseActivity
             Timber.d("user isAnonymous " + user.isAnonymous());
             if (user.isAnonymous()) {
                 user_name.setText("Anonymous");
-                user_email.setText("email");
+                user_email.setText("email@gmail.com");
             } else {
                 user_name.setText(user.getDisplayName());
                 user_email.setText(user.getEmail());
