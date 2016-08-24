@@ -7,6 +7,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,7 +26,7 @@ import info.einverne.guesswords.data.SingleWord;
 import info.einverne.guesswords.detector.ScreenFaceDetector;
 import timber.log.Timber;
 
-public class GameActivity extends AppCompatActivity implements ScreenFaceDetector.Listener {
+public class GameActivity extends BaseActivity implements ScreenFaceDetector.Listener {
     public static final String GROUP_ID = "GROUP_ID";
     private static final String STATE_INDEX = "STATE_INDEX";
     private SensorManager sensorManager;
@@ -33,6 +34,7 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
 
     private boolean isSync = false;
     private boolean isReady = false;
+    private boolean isGameOver = false;
     private TextView tv_guessing_word;
     private TextView tv_game_left_time;
 
@@ -153,8 +155,15 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
     }
 
     private void gameOver() {
-        String key = database.getReference("zh").child("histroy").push().getKey();
-        database.getReference("zh").child("histroy").child(key).setValue(gameRecord);
+        isGameOver = true;
+        tv_guessing_word.setText("Game Over");
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null ){
+            String key = database.getReference("users").child(user.getUid()).child("histroy").push().getKey();
+            database.getReference("users").child(user.getUid()).child("histroy").child(key).setValue(gameRecord);
+        } else {
+
+        }
     }
 
     @Override
@@ -192,7 +201,7 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
     @Override
     public void FaceUp() {
         Timber.d("FaceUp");
-        if (!isReady) return;
+        if (!isReady || isGameOver) return;
         if (index >= randomWords.size()) return;
         gameRecord.put(randomWords.get(index).wordString, false);
         index++;
@@ -201,7 +210,7 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
 
     @Override
     public void FaceDown() {
-        if (!isReady) return;
+        if (!isReady || isGameOver) return;
         if (index >= randomWords.size()) return;
         gameRecord.put(randomWords.get(index).wordString, true);
         index++;
