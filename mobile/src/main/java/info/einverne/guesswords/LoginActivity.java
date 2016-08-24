@@ -1,7 +1,5 @@
 package info.einverne.guesswords;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.ProgressDialog;
@@ -44,19 +42,18 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 
 import timber.log.Timber;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
- * A login screen that offers login via email/password.
+ * A login screen that offers login via email/password or anonymous login.
  */
-public class LoginActivity extends BaseActivity implements LoaderCallbacks<Cursor>, OnClickListener, GoogleApiClient.OnConnectionFailedListener {
+public class LoginActivity extends BaseActivity implements LoaderCallbacks<Cursor>,
+        OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int RC_SIGN_IN = 9001;
     /**
@@ -82,6 +79,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
     private View mProgressView;
     private View mLoginFormView;
 
+    private ProgressDialog progressDialog;
     private GoogleApiClient mGoogleApiClient;
 
     @Override
@@ -96,6 +94,10 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getResources().getString(R.string.login_progress_dialog_message));
+        progressDialog.setIndeterminate(true);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -122,14 +124,12 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         anonymousButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                final ProgressDialog progressDialog = ProgressDialog.show(LoginActivity.this,
-                        getResources().getString(R.string.login_progress_dialog_title),
-                        getResources().getString(R.string.login_progress_dialog_message), true);
+                showProgress(true);
                 mAuth.signInAnonymously()
                         .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                progressDialog.dismiss();
+                                showProgress(false);
                                 Timber.d("signInAnonymously:onComplete " + task.isSuccessful());
 
                                 // If sign in fails, display a message to the user. If sign in succeeds
@@ -277,36 +277,11 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
     /**
      * Shows the progress UI and hides the login form.
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
+        if (show) {
+            progressDialog.show();
         } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            progressDialog.dismiss();
         }
     }
 
