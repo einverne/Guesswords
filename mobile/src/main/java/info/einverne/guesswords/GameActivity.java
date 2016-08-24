@@ -59,6 +59,7 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_game);
 
         database = FirebaseDatabase.getInstance();
@@ -145,6 +146,7 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
                         nLeftTime--;
                         if (nLeftTime < 0) {
                             timerCountDown.cancel();
+                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                             gameOver();
                         }
                     }
