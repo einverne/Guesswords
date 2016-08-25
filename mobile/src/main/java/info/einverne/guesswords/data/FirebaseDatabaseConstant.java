@@ -5,5 +5,7 @@ package info.einverne.guesswords.data;
  */
 public class FirebaseDatabaseConstant {
     public static final String CHINESE_DATABASE = "zh";
+    public static final String USERS = "users";
     public static final String GROUP_KEY = "groups";
+    public static final String HISTORY = "history";
 }

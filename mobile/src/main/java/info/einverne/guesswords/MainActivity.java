@@ -27,7 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Map;
 
-import info.einverne.guesswords.fragment.GameHistroyFragment;
+import info.einverne.guesswords.fragment.GameHistoryFragment;
 import info.einverne.guesswords.fragment.GroupFragment;
 import timber.log.Timber;
 
@@ -58,7 +58,9 @@ public class MainActivity extends BaseActivity
         fragmentManager = getSupportFragmentManager();
 
         groupFragment = GroupFragment.newInstance();
-        histroyFragment = GameHistroyFragment.newInstance("param1", "param2");
+        if (mAuth.getCurrentUser() != null) {
+            histroyFragment = GameHistoryFragment.newInstance(mAuth.getCurrentUser().getUid());
+        }
 
         fragmentManager.beginTransaction()
                 .add(R.id.frame_content, groupFragment)
@@ -209,9 +211,13 @@ public class MainActivity extends BaseActivity
                     .commit();
 
         } else if (id == R.id.nav_game_histroy) {
-            fragmentManager.beginTransaction()
-                    .replace(R.id.frame_content, histroyFragment)
-                    .commit();
+            if (mAuth.getCurrentUser() == null) {
+                startActivity(new Intent(this, LoginActivity.class));
+            } else {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.frame_content, histroyFragment)
+                        .commit();
+            }
         } else if (id == R.id.nav_my_words) {
 
         } else if (id == R.id.nav_setting) {

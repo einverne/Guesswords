@@ -1,7 +1,6 @@
 package info.einverne.guesswords.fragment;
 
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,7 +14,6 @@ import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import info.einverne.guesswords.GameActivity;
 import info.einverne.guesswords.R;
@@ -26,12 +24,10 @@ import timber.log.Timber;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class GroupFragment extends Fragment {
+public class GroupFragment extends BaseFragment {
     private static final String ARG_PARAM1 = "arg_param1";
 
-    private Context context;
     private RecyclerView mRecyclerView;
-    private FirebaseDatabase database;
 
     public GroupFragment() {
         // Required empty public constructor
@@ -72,21 +68,21 @@ public class GroupFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.app_bar_main, container, false);
+        View view = inflater.inflate(R.layout.fragment_content_main, container, false);
 
-        database = FirebaseDatabase.getInstance();
         DatabaseReference groupRef = database
                 .getReference(FirebaseDatabaseConstant.CHINESE_DATABASE)
                 .child(FirebaseDatabaseConstant.GROUP_KEY);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
+        mRecyclerView.setLayoutManager(gridLayoutManager);
 
         FirebaseRecyclerAdapter<Group, GroupViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Group, GroupViewHolder>(
                         Group.class,
-                        R.layout.list_item,
+                        R.layout.group_list_item,
                         GroupViewHolder.class,
                         groupRef
                 ) {

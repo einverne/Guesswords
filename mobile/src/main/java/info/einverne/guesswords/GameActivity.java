@@ -23,6 +23,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import info.einverne.guesswords.data.HistoryData;
+import info.einverne.guesswords.data.SingleData;
 import info.einverne.guesswords.data.SingleWord;
 import info.einverne.guesswords.detector.ScreenFaceDetector;
 import timber.log.Timber;
@@ -51,7 +53,7 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
     List<SingleWord> randomWords = new ArrayList<>();
     private int index = 0;
 
-    private Map<String, Boolean> gameRecord = new HashMap<>();
+    private ArrayList<SingleData> gameRecord = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,7 +184,8 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null ){
             long currentTime = System.currentTimeMillis();
-            database.getReference("users").child(user.getUid()).child("histroy").child(Long.toString(currentTime)).setValue(gameRecord);
+            HistoryData historyData = new HistoryData(currentTime, gameRecord);
+            database.getReference("users").child(user.getUid()).child("history").child(Long.toString(currentTime)).setValue(historyData);
         } else {
 
         }
@@ -225,16 +228,17 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
         Timber.d("FaceUp");
         if (!isReady || isGameOver) return;
         if (index >= randomWords.size()) return;
-        gameRecord.put(randomWords.get(index).wordString, false);
+        gameRecord.add(new SingleData(randomWords.get(index).wordString, false));
         index++;
         tv_guessing_word.setText(randomWords.get(index).wordString);
     }
 
     @Override
     public void FaceDown() {
+        Timber.d("FaceDown");
         if (!isReady || isGameOver) return;
         if (index >= randomWords.size()) return;
-        gameRecord.put(randomWords.get(index).wordString, true);
+        gameRecord.add(new SingleData(randomWords.get(index).wordString, true));
         index++;
         tv_guessing_word.setText(randomWords.get(index).wordString);
     }
