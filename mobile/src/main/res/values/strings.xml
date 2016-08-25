@@ -27,4 +27,6 @@
     <string name="login_progress_dialog_message">loading</string>
     <string name="login_third_part">Third part login</string>
     <string name="auth_failed">Login failed, try again later</string>
+    <string name="game_left_time">剩余时间：%1</string>
+    <string name="game_over">Game Over</string>
 </resources>

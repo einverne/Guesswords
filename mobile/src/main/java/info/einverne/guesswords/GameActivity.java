@@ -1,8 +1,9 @@
 package info.einverne.guesswords;
 
+import android.app.ProgressDialog;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -32,22 +33,21 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
     private SensorManager sensorManager;
     private ScreenFaceDetector screenFaceDetector;
 
-    private boolean isSync = false;
     private boolean isReady = false;
     private boolean isGameOver = false;
     private TextView tv_guessing_word;
     private TextView tv_game_left_time;
+    private TextView tv_replay;
 
     private Timer timerPrepare;
-    private TimerTask timerTaskPrepare;
-    private int nPrepareTime = 2;
+    private int nPrepareTime;
 
     private Timer timerCountDown;
-    private TimerTask timerTaskCountDown;
-    private int nLeftTime = 10;
+    private int nLeftTime;
 
     private String groupId;
     private FirebaseDatabase database;
+    List<SingleWord> words = new ArrayList<>();
     List<SingleWord> randomWords = new ArrayList<>();
     private int index = 0;
 
@@ -69,7 +69,6 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         initSensor();
         initUI();
-        getWords();
 
         if (savedInstanceState != null) {
             index = savedInstanceState.getInt(STATE_INDEX);
@@ -78,18 +77,19 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
 
     public void getWords() {
         Timber.d("groupId " + groupId);
+        final ProgressDialog loading = ProgressDialog.show(this, "", "loading");
         final DatabaseReference databaseReference = database.getReference("zh").child(groupId);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Timber.d("GameActivity data change");
-                List<SingleWord> words = new ArrayList<>();
                 for (DataSnapshot shot : dataSnapshot.getChildren()) {
                     words.add(shot.getValue(SingleWord.class));
                 }
                 for (int i = 0; i < 90; i++) {
                     randomWords.add(words.get(new Random().nextInt(words.size())));
                 }
+                loading.dismiss();
             }
 
             @Override
@@ -102,17 +102,30 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
     private void initUI() {
         tv_guessing_word = (TextView) findViewById(R.id.tv_guessing_word);
         tv_game_left_time = (TextView) findViewById(R.id.tv_game_left_time);
+        tv_game_left_time.setText("");
+        tv_replay = (TextView) findViewById(R.id.tv_replay);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        startGame();
+    }
+
+    private void startGame() {
+        isReady = false;
+        isGameOver = false;
+        index = 0;
+        nPrepareTime = 2;
+        nLeftTime = 10;
+        tv_replay.setVisibility(View.GONE);
+        getWords();
         startTimerPrepare();
     }
 
     private void startTimerPrepare() {
         timerPrepare = new Timer();
-        timerTaskPrepare = new TimerTask() {
+        TimerTask timerTaskPrepare = new TimerTask() {
             @Override
             public void run() {
                 runOnUiThread(new Runnable() {
@@ -136,13 +149,13 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
 
     private void startCountDown() {
         timerCountDown = new Timer();
-        timerTaskCountDown = new TimerTask() {
+        TimerTask timerTaskCountDown = new TimerTask() {
             @Override
             public void run() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        tv_game_left_time.setText(nLeftTime + "");
+                        tv_game_left_time.setText(getResources().getString(R.string.game_left_time).replace("%1", Integer.toString(nLeftTime)));
                         nLeftTime--;
                         if (nLeftTime < 0) {
                             timerCountDown.cancel();
@@ -158,11 +171,18 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
 
     private void gameOver() {
         isGameOver = true;
-        tv_guessing_word.setText("Game Over");
+        tv_guessing_word.setText(getString(R.string.game_over));
+        tv_replay.setVisibility(View.VISIBLE);
+        tv_replay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startGame();
+            }
+        });
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null ){
-            String key = database.getReference("users").child(user.getUid()).child("histroy").push().getKey();
-            database.getReference("users").child(user.getUid()).child("histroy").child(key).setValue(gameRecord);
+            long currentTime = System.currentTimeMillis();
+            database.getReference("users").child(user.getUid()).child("histroy").child(Long.toString(currentTime)).setValue(gameRecord);
         } else {
 
         }

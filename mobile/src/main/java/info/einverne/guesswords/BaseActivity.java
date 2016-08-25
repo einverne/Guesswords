@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 import timber.log.Timber;
 
@@ -17,6 +18,8 @@ public class BaseActivity extends AppCompatActivity {
 
     protected FirebaseAuth mAuth;
     protected FirebaseAuth.AuthStateListener mAuthListener;
+
+    protected FirebaseDatabase database;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,6 +38,8 @@ public class BaseActivity extends AppCompatActivity {
                 }
             }
         };
+
+        database = FirebaseDatabase.getInstance();
     }
 
     @Override
