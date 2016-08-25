@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -71,6 +72,7 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         initSensor();
         initUI();
+        getWords();
 
         if (savedInstanceState != null) {
             index = savedInstanceState.getInt(STATE_INDEX);
@@ -88,9 +90,7 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
                 for (DataSnapshot shot : dataSnapshot.getChildren()) {
                     words.add(shot.getValue(SingleWord.class));
                 }
-                for (int i = 0; i < 90; i++) {
-                    randomWords.add(words.get(new Random().nextInt(words.size())));
-                }
+                getRandomWords();
                 loading.dismiss();
             }
 
@@ -99,6 +99,13 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
                 Timber.w(databaseError.toException(), "getWords onCancelled");
             }
         });
+    }
+
+    private void getRandomWords() {
+        randomWords.clear();
+        for (int i = 0; i < 90; i++) {
+            randomWords.add(words.get(new Random().nextInt(words.size())));
+        }
     }
 
     private void initUI() {
@@ -121,7 +128,6 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
         nPrepareTime = 2;
         nLeftTime = 10;
         tv_replay.setVisibility(View.GONE);
-        getWords();
         startTimerPrepare();
     }
 
@@ -187,8 +193,9 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
             HistoryData historyData = new HistoryData(currentTime, gameRecord);
             database.getReference("users").child(user.getUid()).child("history").child(Long.toString(currentTime)).setValue(historyData);
         } else {
-
+            Toast.makeText(GameActivity.this, "Login to save histroy", Toast.LENGTH_SHORT).show();
         }
+        getRandomWords();
     }
 
     @Override
