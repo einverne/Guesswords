@@ -125,8 +125,8 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
         isReady = false;
         isGameOver = false;
         index = 0;
-        nPrepareTime = 2;
-        nLeftTime = 10;
+        nPrepareTime = 4;
+        nLeftTime = Integer.parseInt(sharedPreferences.getString(SettingsActivity.GAME_DURATION, "90"));
         tv_replay.setVisibility(View.GONE);
         startTimerPrepare();
     }

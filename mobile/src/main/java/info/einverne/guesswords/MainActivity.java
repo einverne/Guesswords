@@ -133,8 +133,9 @@ public class MainActivity extends BaseActivity
                     } else {
                         FirebaseAuth.getInstance().signOut();
                     }
-                    updateSignUI();
-
+                    Intent intent = getIntent();
+                    finish();
+                    startActivity(intent);
                 }
             });
             imageViewAvatar = (ImageView) navHeader.findViewById(R.id.imageViewAvatar);
@@ -147,7 +148,7 @@ public class MainActivity extends BaseActivity
             Timber.d("user isAnonymous " + user.isAnonymous());
             if (user.isAnonymous()) {
                 user_name.setText("Anonymous");
-                user_email.setText("email@gmail.com");
+                user_email.setText("username@gmail.com");
             } else {
                 user_name.setText(user.getDisplayName());
                 user_email.setText(user.getEmail());
@@ -164,6 +165,7 @@ public class MainActivity extends BaseActivity
                 }
             });
         }
+        navigationView.setCheckedItem(R.id.nav_game_groups);
     }
 
     @Override
@@ -197,6 +199,7 @@ public class MainActivity extends BaseActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startSetting();
             return true;
         }
 
@@ -228,7 +231,7 @@ public class MainActivity extends BaseActivity
 
         } else if (id == R.id.nav_setting) {
             Timber.d("nav setting clicked");
-
+            startSetting();
         } else if (id == R.id.nav_about) {
             Timber.d("nav about clicked");
 
@@ -236,5 +239,9 @@ public class MainActivity extends BaseActivity
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void startSetting() {
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 }

@@ -1,6 +1,8 @@
 package info.einverne.guesswords;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +23,8 @@ public class BaseActivity extends AppCompatActivity {
 
     protected FirebaseDatabase database;
 
+    protected SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +44,8 @@ public class BaseActivity extends AppCompatActivity {
         };
 
         database = FirebaseDatabase.getInstance();
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     @Override
