@@ -29,4 +29,11 @@
     <string name="auth_failed">Login failed, try again later</string>
     <string name="game_left_time">剩余时间：%1</string>
     <string name="game_over">Game Over</string>
+
+    <!-- drawer nav -->
+    <string name="nav_choose_group">Choose Groups</string>
+    <string name="nav_game_history">Game Histroy</string>
+    <string name="nav_my_words">My Words</string>
+    <string name="nav_setting">Setting</string>
+    <string name="nav_about">About</string>
 </resources>
