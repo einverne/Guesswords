@@ -393,6 +393,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Timber.d("firebaseAuthWithGoogle: " + acct.getId());
+        showProgress(true);
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(LoginActivity.this,
@@ -400,6 +401,8 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 Timber.d("signInWithCredential:onComplete:" + task.isSuccessful());
+
+                                showProgress(false);
 
                                 // If sign in fails, display a message to the user. If sign in succeeds
                                 // the auth state listener will be notified and logic to handle the
