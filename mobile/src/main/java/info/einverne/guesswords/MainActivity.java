@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.Map;
 
@@ -136,6 +137,11 @@ public class MainActivity extends BaseActivity
 
                 }
             });
+            imageViewAvatar = (ImageView) navHeader.findViewById(R.id.imageViewAvatar);
+            imageViewAvatar.setOnClickListener(null);
+            if (user.getPhotoUrl() != null) {
+                Picasso.with(this).load(user.getPhotoUrl()).into(imageViewAvatar);
+            }
             TextView user_name = (TextView) navHeader.findViewById(R.id.user_name);
             TextView user_email = (TextView) navHeader.findViewById(R.id.user_email);
             Timber.d("user isAnonymous " + user.isAnonymous());
@@ -150,6 +156,7 @@ public class MainActivity extends BaseActivity
             view_before_login.setVisibility(View.VISIBLE);
             view_after_login.setVisibility(View.GONE);
             imageViewAvatar = (ImageView) navHeader.findViewById(R.id.imageViewAvatar);
+            imageViewAvatar.setImageResource(R.drawable.default_avater);
             imageViewAvatar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -211,18 +218,19 @@ public class MainActivity extends BaseActivity
             if (mAuth.getCurrentUser() == null) {
                 startActivity(new Intent(this, LoginActivity.class));
             } else {
-                if (histroyFragment == null) {
-                    histroyFragment = GameHistoryFragment.newInstance(mAuth.getCurrentUser().getUid());
-                }
+                histroyFragment = GameHistoryFragment.newInstance(mAuth.getCurrentUser().getUid());
                 fragmentManager.beginTransaction()
                         .replace(R.id.frame_content, histroyFragment)
                         .commit();
             }
         } else if (id == R.id.nav_my_words) {
+            Timber.d("nav my words clicked");
 
         } else if (id == R.id.nav_setting) {
+            Timber.d("nav setting clicked");
 
         } else if (id == R.id.nav_about) {
+            Timber.d("nav about clicked");
 
         }
 
