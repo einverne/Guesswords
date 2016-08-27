@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.Map;
+import java.util.TooManyListenersException;
 
 import info.einverne.guesswords.fragment.GameHistoryFragment;
 import info.einverne.guesswords.fragment.GroupFragment;
@@ -69,11 +71,8 @@ public class MainActivity extends BaseActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                Intent intent = new Intent(MainActivity.this, GameActivity.class);
-                intent.putExtra(GameActivity.GROUP_ID, "characters");
-                startActivity(intent);
+
+                Toast.makeText(MainActivity.this, "Random all available words feature will be available next version", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -228,13 +227,13 @@ public class MainActivity extends BaseActivity
             }
         } else if (id == R.id.nav_my_words) {
             Timber.d("nav my words clicked");
-
+            Toast.makeText(MainActivity.this, "Add your own words will be available next version", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_setting) {
             Timber.d("nav setting clicked");
             startSetting();
         } else if (id == R.id.nav_about) {
             Timber.d("nav about clicked");
-
+            startActivity(new Intent(MainActivity.this, AboutActivity.class));
         }
 
         drawer.closeDrawer(GravityCompat.START);
