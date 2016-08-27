@@ -58,9 +58,6 @@ public class MainActivity extends BaseActivity
         fragmentManager = getSupportFragmentManager();
 
         groupFragment = GroupFragment.newInstance();
-        if (mAuth.getCurrentUser() != null) {
-            histroyFragment = GameHistoryFragment.newInstance(mAuth.getCurrentUser().getUid());
-        }
 
         fragmentManager.beginTransaction()
                 .add(R.id.frame_content, groupFragment)
@@ -214,6 +211,9 @@ public class MainActivity extends BaseActivity
             if (mAuth.getCurrentUser() == null) {
                 startActivity(new Intent(this, LoginActivity.class));
             } else {
+                if (histroyFragment == null) {
+                    histroyFragment = GameHistoryFragment.newInstance(mAuth.getCurrentUser().getUid());
+                }
                 fragmentManager.beginTransaction()
                         .replace(R.id.frame_content, histroyFragment)
                         .commit();
