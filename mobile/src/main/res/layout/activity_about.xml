@@ -9,9 +9,32 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="info.einverne.guesswords.AboutActivity">
 
+
+    <ImageView
+        android:id="@+id/launcher_icon"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_centerHorizontal="true"
+        android:src="@mipmap/ic_launcher" />
+
+    <TextView
+        android:id="@+id/versionNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/launcher_icon"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="0.0.1"
+        android:textColor="#000000"
+        android:textSize="18sp" />
+
     <TextView
         android:id="@+id/aboutTitle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="" />
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/versionNumber"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="@string/about_content" />
+
 </RelativeLayout>
