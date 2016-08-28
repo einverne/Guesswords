@@ -95,12 +95,12 @@ public class MainActivity extends BaseActivity
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 loading.dismiss();
-
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                loading.dismiss();
+                Toast.makeText(MainActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
