@@ -92,6 +92,7 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
                 }
                 getRandomWords();
                 loading.dismiss();
+                startGame();
             }
 
             @Override
@@ -118,7 +119,6 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
     @Override
     protected void onStart() {
         super.onStart();
-        startGame();
     }
 
     private void startGame() {
