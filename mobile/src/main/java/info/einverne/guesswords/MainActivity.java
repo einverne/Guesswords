@@ -26,8 +26,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.util.Map;
-
 import info.einverne.guesswords.fragment.GameHistoryFragment;
 import info.einverne.guesswords.fragment.GroupFragment;
 import timber.log.Timber;
@@ -46,9 +44,7 @@ public class MainActivity extends BaseActivity
     // fragment
     private FragmentManager fragmentManager;
     private GroupFragment groupFragment;
-    private Fragment histroyFragment;
-
-    private Map<String, String> groupsMap;
+    private Fragment historyFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,8 +84,7 @@ public class MainActivity extends BaseActivity
         view_before_login = navHeader.findViewById(R.id.nav_header_before_login);
         view_after_login = navHeader.findViewById(R.id.nav_header_after_login);
 
-
-        final ProgressDialog loading = ProgressDialog.show(this, "First time init", "loading");
+        final ProgressDialog loading = ProgressDialog.show(this, "", "loading");
         database.getReference("zh").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -197,12 +192,24 @@ public class MainActivity extends BaseActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            startSetting();
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                startSetting();
+                break;
+//            case R.id.action_add_group:
+//                WordsManager.createGroup(database, "groupId", "groupName", new WordsManager.QueryFinishedListener() {
+//                    @Override
+//                    public void onSuccess(Object object) {
+//                        Timber.d("create group success");
+//                    }
+//
+//                    @Override
+//                    public void onFailed(DatabaseError error) {
+//
+//                    }
+//                });
+//                break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -221,9 +228,9 @@ public class MainActivity extends BaseActivity
             if (mAuth.getCurrentUser() == null) {
                 startActivity(new Intent(this, LoginActivity.class));
             } else {
-                histroyFragment = GameHistoryFragment.newInstance(mAuth.getCurrentUser().getUid());
+                historyFragment = GameHistoryFragment.newInstance(mAuth.getCurrentUser().getUid());
                 fragmentManager.beginTransaction()
-                        .replace(R.id.frame_content, histroyFragment)
+                        .replace(R.id.frame_content, historyFragment)
                         .commit();
             }
         } else if (id == R.id.nav_my_words) {

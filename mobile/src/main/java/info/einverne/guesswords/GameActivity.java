@@ -27,6 +27,7 @@ import java.util.TimerTask;
 import info.einverne.guesswords.data.HistoryData;
 import info.einverne.guesswords.data.SingleData;
 import info.einverne.guesswords.data.SingleWord;
+import info.einverne.guesswords.data.WordsManager;
 import info.einverne.guesswords.detector.ScreenFaceDetector;
 import timber.log.Timber;
 
@@ -82,22 +83,21 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
     public void getWords() {
         Timber.d("groupId " + groupId);
         final ProgressDialog loading = ProgressDialog.show(this, "", "loading");
-        final DatabaseReference databaseReference = database.getReference("zh").child(groupId);
-        databaseReference.addValueEventListener(new ValueEventListener() {
+
+
+        WordsManager.getWordsByGroupId(database, groupId, new WordsManager.QueryFinishedListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Timber.d("GameActivity data change");
-                for (DataSnapshot shot : dataSnapshot.getChildren()) {
-                    words.add(shot.getValue(SingleWord.class));
-                }
+            public void onSuccess(Object object) {
+                words.addAll((ArrayList<SingleWord>) object);
                 getRandomWords();
                 loading.dismiss();
                 startGame();
+
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Timber.w(databaseError.toException(), "getWords onCancelled");
+            public void onFailed(DatabaseError error) {
+
             }
         });
     }
