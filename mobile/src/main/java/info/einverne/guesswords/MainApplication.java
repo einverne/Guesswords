@@ -28,7 +28,10 @@ public class MainApplication extends Application {
         }
 
         // Firebase settings
-        if (!FirebaseApp.getApps(this).isEmpty())
+        if (!FirebaseApp.getApps(this).isEmpty()) {
+            Timber.d("setPersistenceEnabled set to true");
             FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        }
+
     }
 }

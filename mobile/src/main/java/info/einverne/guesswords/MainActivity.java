@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -28,7 +27,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.Map;
-import java.util.TooManyListenersException;
 
 import info.einverne.guesswords.fragment.GameHistoryFragment;
 import info.einverne.guesswords.fragment.GroupFragment;
@@ -66,13 +64,14 @@ public class MainActivity extends BaseActivity
                 .add(R.id.frame_content, groupFragment)
                 .commit();
 
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                Toast.makeText(MainActivity.this, "Random all available words feature will be available next version", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, GameActivity.class);
+                intent.putExtra(GameActivity.GROUP_ID, "random");
+                startActivity(intent);
             }
         });
 
@@ -89,12 +88,14 @@ public class MainActivity extends BaseActivity
         view_before_login = navHeader.findViewById(R.id.nav_header_before_login);
         view_after_login = navHeader.findViewById(R.id.nav_header_after_login);
 
-        final ProgressDialog loading = ProgressDialog.show(this, "", "loading");
-        database.getReference("zh").addValueEventListener(new ValueEventListener() {
+
+        final ProgressDialog loading = ProgressDialog.show(this, "First time init", "loading");
+        database.getReference("zh").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 loading.dismiss();
+
             }
 
             @Override
