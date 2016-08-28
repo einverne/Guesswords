@@ -116,7 +116,7 @@
                     android:id="@+id/btn_anonymous_login"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="anonymous login" />
+                    android:text="@string/btn_anonymous_login" />
 
             </LinearLayout>
 

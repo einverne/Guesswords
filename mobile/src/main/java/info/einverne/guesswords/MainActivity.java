@@ -84,7 +84,8 @@ public class MainActivity extends BaseActivity
         view_before_login = navHeader.findViewById(R.id.nav_header_before_login);
         view_after_login = navHeader.findViewById(R.id.nav_header_after_login);
 
-        final ProgressDialog loading = ProgressDialog.show(this, "", "loading");
+        final ProgressDialog loading = ProgressDialog.show(this, "",
+                getResources().getString(R.string.data_progress_dialog_message));
         database.getReference("zh").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

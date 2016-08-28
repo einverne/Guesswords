@@ -6,7 +6,7 @@
         android:entries="@array/game_duration_settings"
         android:entryValues="@array/game_duration_settings_value"
         android:key="gameDuration"
-        android:summary="The duration of game"
-        android:title="Game Duration" />
+        android:summary="@string/setting_game_duration_summary"
+        android:title="@string/setting_game_duration_title" />
 
 </PreferenceScreen>
