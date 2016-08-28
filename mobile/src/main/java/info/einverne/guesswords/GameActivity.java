@@ -188,7 +188,7 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
             }
         });
         FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null ){
+        if (user != null && !gameRecord.isEmpty()){
             long currentTime = System.currentTimeMillis();
             HistoryData historyData = new HistoryData(currentTime, gameRecord);
             database.getReference("users").child(user.getUid()).child("history").child(Long.toString(currentTime)).setValue(historyData);
