@@ -1,6 +1,8 @@
 package info.einverne.guesswords;
 
 import android.app.Application;
+import android.content.Context;
+import android.support.multidex.MultiDex;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.FirebaseDatabase;
@@ -33,5 +35,11 @@ public class MainApplication extends Application {
             FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         }
 
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 }
