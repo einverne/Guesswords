@@ -5,28 +5,29 @@
         <item
             android:id="@+id/nav_game_groups"
             android:checked="true"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Game Groups" />
+            android:icon="@drawable/ic_menu_group"
+            android:title="@string/nav_choose_group" />
         <item
             android:id="@+id/nav_game_histroy"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Game Histroy" />
+            android:icon="@drawable/ic_menu_history"
+            android:title="@string/nav_game_history" />
         <item
             android:id="@+id/nav_my_words"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="My Words" />
+            android:icon="@drawable/ic_menu_my"
+            android:title="@string/nav_my_words" />
     </group>
 
-    <item android:title="Communicate">
+    <group android:checkableBehavior="single">
         <menu>
             <item
                 android:id="@+id/nav_setting"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Setting" />
+                android:icon="@drawable/ic_menu_setting"
+                android:title="@string/nav_setting" />
             <item
                 android:id="@+id/nav_about"
-                android:title="About" />
+                android:icon="@drawable/ic_menu_about"
+                android:title="@string/nav_about" />
         </menu>
-    </item>
+    </group>
 
 </menu>

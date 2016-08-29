@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">爱猜才会赢</string>
+
+    <string name="navigation_drawer_open">打开导航栏</string>
+    <string name="navigation_drawer_close">关闭导航栏</string>
+
+    <string name="action_settings">设置</string>
+    <string name="title_activity_login">登陆</string>
+    <string name="title_activity_settings">设置</string>
+    <string name="title_activity_about">关于</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">邮箱</string>
+    <string name="prompt_password">密码</string>
+    <string name="action_sign_up">注册</string>
+    <string name="action_sign_in">登陆</string>
+    <string name="action_sign_in_short">登陆</string>
+    <string name="error_invalid_email">邮箱地址无效</string>
+    <string name="error_invalid_password">密码太短</string>
+    <string name="error_incorrect_password">密码不正确</string>
+    <string name="error_field_required">此项必填</string>
+    <string name="permission_rationale">"通讯录权限用来补全邮箱内容"
+    </string>
+
+    <string name="btn_anonymous_login">匿名登陆</string>
+    <string name="login_progress_dialog_title">匿名登陆</string>
+    <string name="login_progress_dialog_message">加载</string>
+    <string name="login_third_part">第三方登陆</string>
+    <string name="auth_failed">登录失败，请稍后重试</string>
+    <string name="game_left_time">剩余时间：%1</string>
+    <string name="game_over">游戏结束</string>
+
+    <!-- drawer nav -->
+    <string name="nav_choose_group">选择分组</string>
+    <string name="nav_game_history">游戏记录</string>
+    <string name="nav_my_words">自定义</string>
+    <string name="nav_setting">设置</string>
+    <string name="nav_about">关于</string>
+    <string name="action_add_group">增加</string>
+    <string name="nav_login_before">点击头像登陆</string>
+
+    <!-- About -->
+    <string name="about_content">这是一个基于个人兴趣制作的猜词应用</string>
+    <string name="data_progress_dialog_message">加载</string>
+
+    <!-- Setting -->
+    <string name="setting_game_duration_title">游戏时长</string>
+    <string name="setting_game_duration_summary">游戏历时时间可有90,180,300秒选择</string>
+
+</resources>

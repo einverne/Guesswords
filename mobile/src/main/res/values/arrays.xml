@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="game_duration_settings">
+        <item>90s</item>
+        <item>180s</item>
+        <item>300s</item>
+    </string-array>
+    <string-array name="game_duration_settings_value">
+        <item>90</item>
+        <item>180</item>
+        <item>300</item>
+    </string-array>
+</resources>

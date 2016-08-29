@@ -1,12 +1,15 @@
 package info.einverne.guesswords;
 
+import android.app.ProgressDialog;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -14,37 +17,45 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import info.einverne.guesswords.data.HistoryData;
+import info.einverne.guesswords.data.SingleData;
 import info.einverne.guesswords.data.SingleWord;
+import info.einverne.guesswords.data.WordsManager;
 import info.einverne.guesswords.detector.ScreenFaceDetector;
 import timber.log.Timber;
 
-public class GameActivity extends AppCompatActivity implements ScreenFaceDetector.Listener {
+public class GameActivity extends BaseActivity implements ScreenFaceDetector.Listener {
     public static final String GROUP_ID = "GROUP_ID";
+    private static final String STATE_INDEX = "STATE_INDEX";
     private SensorManager sensorManager;
     private ScreenFaceDetector screenFaceDetector;
 
     private boolean isReady = false;
+    private boolean isGameOver = false;
     private TextView tv_guessing_word;
     private TextView tv_game_left_time;
+    private TextView tv_replay;
 
     private Timer timerPrepare;
-    private TimerTask timerTaskPrepare;
-    private int nPrepareTime = 5;
+    private int nPrepareTime;
 
     private Timer timerCountDown;
-    private TimerTask timerTaskCountDown;
-    private int nLeftTime = 90;
+    private int nLeftTime;
 
     private String groupId;
     private FirebaseDatabase database;
     List<SingleWord> words = new ArrayList<>();
+    List<SingleWord> randomWords = new ArrayList<>();
     private int index = 0;
+
+    private ArrayList<SingleData> gameRecord = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +63,7 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_game);
 
         database = FirebaseDatabase.getInstance();
@@ -63,46 +75,65 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
         initUI();
         getWords();
 
-
+        if (savedInstanceState != null) {
+            index = savedInstanceState.getInt(STATE_INDEX);
+        }
     }
 
     public void getWords() {
-        final DatabaseReference databaseReference = database.getReference("zh").child(groupId);
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        Timber.d("groupId " + groupId);
+        final ProgressDialog loading = ProgressDialog.show(this, "", "loading");
+
+
+        WordsManager.getWordsByGroupId(database, groupId, new WordsManager.QueryFinishedListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot shot : dataSnapshot.getChildren()) {
-                    words.add(shot.getValue(SingleWord.class));
-                }
+            public void onSuccess(Object object) {
+                words.addAll((ArrayList<SingleWord>) object);
+                getRandomWords();
+                loading.dismiss();
+                startGame();
+
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Timber.w(databaseError.toException(), "getWords onCancelled");
+            public void onFailed(DatabaseError error) {
+
             }
         });
-        long seed = System.nanoTime();
-        Collections.shuffle(words, new Random(seed));
     }
 
-    public void addNewItem(String groupId, String guessWord) {
+    private void getRandomWords() {
+        randomWords.clear();
+        for (int i = 0; i < 90; i++) {
+            randomWords.add(words.get(new Random().nextInt(words.size())));
+        }
     }
-
 
     private void initUI() {
         tv_guessing_word = (TextView) findViewById(R.id.tv_guessing_word);
         tv_game_left_time = (TextView) findViewById(R.id.tv_game_left_time);
+        tv_game_left_time.setText("");
+        tv_replay = (TextView) findViewById(R.id.tv_replay);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    private void startGame() {
+        isReady = false;
+        isGameOver = false;
+        index = 0;
+        nPrepareTime = 4;
+        nLeftTime = Integer.parseInt(sharedPreferences.getString(SettingsActivity.GAME_DURATION, "90"));
+        tv_replay.setVisibility(View.GONE);
         startTimerPrepare();
     }
 
     private void startTimerPrepare() {
         timerPrepare = new Timer();
-        timerTaskPrepare = new TimerTask() {
+        TimerTask timerTaskPrepare = new TimerTask() {
             @Override
             public void run() {
                 runOnUiThread(new Runnable() {
@@ -114,6 +145,8 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
                             timerPrepare.cancel();
                             isReady = true;
                             startCountDown();
+                            if (randomWords.size() <= 0) return;
+                            tv_guessing_word.setText(randomWords.get(index).wordString);
                         }
                     }
                 });
@@ -124,18 +157,18 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
 
     private void startCountDown() {
         timerCountDown = new Timer();
-        timerTaskCountDown = new TimerTask() {
+        TimerTask timerTaskCountDown = new TimerTask() {
             @Override
             public void run() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        tv_game_left_time.setText(nLeftTime + "");
+                        tv_game_left_time.setText(getResources().getString(R.string.game_left_time).replace("%1", Integer.toString(nLeftTime)));
                         nLeftTime--;
                         if (nLeftTime < 0) {
                             timerCountDown.cancel();
-                            if (words.size() <= 0) return;
-                            tv_guessing_word.setText(words.get(index).wordString);
+                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                            gameOver();
                         }
                     }
                 });
@@ -144,21 +177,43 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
         timerCountDown.schedule(timerTaskCountDown, 0, 1000);
     }
 
+    private void gameOver() {
+        isGameOver = true;
+        tv_guessing_word.setText(getString(R.string.game_over));
+        tv_replay.setVisibility(View.VISIBLE);
+        tv_replay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startGame();
+            }
+        });
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null && !gameRecord.isEmpty()){
+            long currentTime = System.currentTimeMillis();
+            HistoryData historyData = new HistoryData(currentTime, gameRecord);
+            database.getReference("users").child(user.getUid()).child("history").child(Long.toString(currentTime)).setValue(historyData);
+        } else {
+            Toast.makeText(GameActivity.this, "Login to save histroy", Toast.LENGTH_SHORT).show();
+        }
+        getRandomWords();
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
         screenFaceDetector.stop();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
         if (timerPrepare != null) {
             timerPrepare.cancel();
         }
         if (timerCountDown != null) {
             timerCountDown.cancel();
         }
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
     @Override
@@ -167,22 +222,33 @@ public class GameActivity extends AppCompatActivity implements ScreenFaceDetecto
         initSensor();
     }
 
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_INDEX, index);
+
+    }
+
     @Override
     public void FaceUp() {
-        if (!isReady) return;
-        if (index >= words.size()) return;
-        tv_guessing_word.setText(words.get(index).wordString);
+        Timber.d("FaceUp");
+        if (!isReady || isGameOver) return;
+        if (index >= randomWords.size()) return;
+        gameRecord.add(new SingleData(randomWords.get(index).wordString, false));
         index++;
+        tv_guessing_word.setText(randomWords.get(index).wordString);
     }
 
     @Override
     public void FaceDown() {
-        if (!isReady) return;
-        if (index >= words.size()) return;
-        tv_guessing_word.setText(words.get(index).wordString);
+        Timber.d("FaceDown");
+        if (!isReady || isGameOver) return;
+        if (index >= randomWords.size()) return;
+        gameRecord.add(new SingleData(randomWords.get(index).wordString, true));
         index++;
+        tv_guessing_word.setText(randomWords.get(index).wordString);
     }
-
 
     private void initSensor() {
         if (screenFaceDetector == null) {

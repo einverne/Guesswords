@@ -3,14 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/game_bg_color"
     tools:context="info.einverne.guesswords.GameActivity">
 
     <TextView
         android:id="@+id/tv_guessing_word"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:background="@color/game_bg_color"
         android:gravity="center"
         android:text="Text"
         android:textColor="@color/game_text_color"
@@ -24,8 +24,17 @@
         android:layout_alignParentTop="true"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:text="剩余时间：90"
+        android:text="@string/game_left_time"
         android:textColor="@color/game_text_color"
         android:textSize="35sp" />
+
+    <TextView
+        android:id="@+id/tv_replay"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@+id/tv_guessing_word"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/quantum_ic_replay_white_24"
+        android:visibility="gone" />
 
 </RelativeLayout>

@@ -15,7 +15,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "922471078258-snd7qm3fu108m5vjhnhqit4mdl0om09n.apps.googleusercontent.com",
+          "client_id": "922471078258-9l41qmoq4i28lcoiblnn97r5ov94l25t.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "info.einverne.guesswords",
@@ -37,13 +37,8 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "922471078258-bjfc8s6kis3iik0jsoq81ukj76cce43t.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2
