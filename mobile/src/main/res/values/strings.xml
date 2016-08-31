@@ -38,7 +38,7 @@
     <string name="nav_setting">Setting</string>
     <string name="nav_about">About</string>
     <string name="action_add_group">Add group</string>
-    <string name="nav_login_before">Click avatar to login</string>
+    <string name="nav_header_login_before">Click avatar to login</string>
 
     <!-- About -->
     <string name="about_content">This is a simple game based on personal interest.</string>
@@ -47,4 +47,5 @@
     <!-- Setting -->
     <string name="setting_game_duration_title">Game Duration</string>
     <string name="setting_game_duration_summary">The duration of game</string>
+    <string name="nav_how_to_play">How to play</string>
 </resources>

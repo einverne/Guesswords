@@ -225,7 +225,7 @@ public class MainActivity extends BaseActivity
                     .replace(R.id.frame_content, groupFragment)
                     .commit();
 
-        } else if (id == R.id.nav_game_histroy) {
+        } else if (id == R.id.nav_game_history) {
             if (mAuth.getCurrentUser() == null) {
                 startActivity(new Intent(this, LoginActivity.class));
             } else {
