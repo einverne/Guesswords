@@ -218,31 +218,41 @@ public class MainActivity extends BaseActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_game_groups) {
-            fragmentManager.beginTransaction()
-                    .replace(R.id.frame_content, groupFragment)
-                    .commit();
-
-        } else if (id == R.id.nav_game_history) {
-            if (mAuth.getCurrentUser() == null) {
-                startActivity(new Intent(this, LoginActivity.class));
-            } else {
-                historyFragment = GameHistoryFragment.newInstance(mAuth.getCurrentUser().getUid());
+        switch (item.getItemId()) {
+            case R.id.nav_game_groups:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.frame_content, historyFragment)
+                        .replace(R.id.frame_content, groupFragment)
                         .commit();
-            }
-        } else if (id == R.id.nav_my_words) {
-            Timber.d("nav my words clicked");
-            Toast.makeText(MainActivity.this, "Add your own words will be available next version", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_setting) {
-            Timber.d("nav setting clicked");
-            startSetting();
-        } else if (id == R.id.nav_about) {
-            Timber.d("nav about clicked");
-            startActivity(new Intent(MainActivity.this, AboutActivity.class));
+
+                break;
+            case R.id.nav_game_history:
+                if (mAuth.getCurrentUser() == null) {
+                    startActivity(new Intent(this, LoginActivity.class));
+                } else {
+                    historyFragment = GameHistoryFragment.newInstance(mAuth.getCurrentUser().getUid());
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.frame_content, historyFragment)
+                            .commit();
+                }
+
+                break;
+            case R.id.nav_my_words:
+                Timber.d("nav my words clicked");
+                Toast.makeText(MainActivity.this, "Add your own words will be available next version", Toast.LENGTH_SHORT).show();
+
+                break;
+            case R.id.nav_how_to_play:
+                Timber.d("nav how to play");
+                startActivity(new Intent(MainActivity.this, HowToPlayActivity.class));
+                break;
+            case R.id.nav_setting:
+                Timber.d("nav setting clicked");
+                startSetting();
+                break;
+            case R.id.nav_about:
+                Timber.d("nav about clicked");
+                startActivity(new Intent(MainActivity.this, AboutActivity.class));
+                break;
         }
 
         drawer.closeDrawer(GravityCompat.START);

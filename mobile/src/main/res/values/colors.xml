@@ -5,4 +5,5 @@
     <color name="colorAccent">#FF4081</color>
     <color name="game_bg_color">#63a8d7</color>
     <color name="game_text_color">#FFFFFF</color>
+    <color name="blackOverlay">#33000000</color>
 </resources>
