@@ -195,22 +195,28 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
 
     @Override
     public void FaceUp() {
-        Timber.d("FaceUp");
+        Timber.d("FaceUp " + index);
         if (!isReady || isGameOver) return;
-        if (index >= randomWordsFromDb.size()) return;
+        index++;
+        if (index >= randomWordsFromDb.size()){
+            tv_guessing_word.setText(getString(R.string.game_no_more_words));
+            return;
+        }
         gameRecord.add(new SingleData(randomWordsFromDb.get(index), false));
         tv_guessing_word.setText(randomWordsFromDb.get(index));
-        index++;
     }
 
     @Override
     public void FaceDown() {
-        Timber.d("FaceDown");
+        Timber.d("FaceDown " + index);
         if (!isReady || isGameOver) return;
-        if (index >= randomWordsFromDb.size()) return;
+        index++;
+        if (index >= randomWordsFromDb.size()){
+            tv_guessing_word.setText(getString(R.string.game_no_more_words));
+            return;
+        }
         gameRecord.add(new SingleData(randomWordsFromDb.get(index), true));
         tv_guessing_word.setText(randomWordsFromDb.get(index));
-        index++;
     }
 
     private void initSensor() {
