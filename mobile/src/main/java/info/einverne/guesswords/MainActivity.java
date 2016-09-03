@@ -91,32 +91,11 @@ public class MainActivity extends BaseActivity
         fragmentManager.beginTransaction()
                 .add(R.id.frame_content, groupFragment)
                 .commit();
-        
+
         // first time download all words from server
         boolean isFirstTimeInit = getDeviceSharedPreferences().getBoolean("isFirstTimeInit", true);
         if (isFirstTimeInit) {
-            dialog = ProgressDialog.show(this, "",
-                    getResources().getString(R.string.data_progress_dialog_message));
-            IntentFilter intentFilter = new IntentFilter(DownloadService.BROADCAST_ACTION);
-            downloadReceiver = new DownloadFinishReceiver();
-            LocalBroadcastManager.getInstance(this).registerReceiver(downloadReceiver, intentFilter);
-
-            firebaseDownloadManager = new FirebaseDownloadManager(this);
-            firebaseDownloadManager.initAll(new FirebaseDownloadManager.FirebaseDownloadListener() {
-                @Override
-                public void onFinished(Object object) {
-                    groupFragment = GroupFragment.newInstance();
-
-                    fragmentManager.beginTransaction()
-                            .add(R.id.frame_content, groupFragment)
-                            .commit();
-                }
-
-                @Override
-                public void onFailed() {
-
-                }
-            });
+            updateDatabase();
             setDeviceSharedPreferences("isFirstTimeInit", false);
         }
     }
@@ -273,6 +252,10 @@ public class MainActivity extends BaseActivity
                 Timber.d("nav how to play");
                 startActivity(new Intent(MainActivity.this, HowToPlayActivity.class));
                 break;
+            case R.id.nav_update_db:
+                updateDatabase();
+                navigationView.setCheckedItem(R.id.group_main);
+                break;
             case R.id.nav_setting:
                 Timber.d("nav setting clicked");
                 startSetting();
@@ -289,6 +272,31 @@ public class MainActivity extends BaseActivity
 
     private void startSetting() {
         startActivity(new Intent(this, SettingsActivity.class));
+    }
+
+    private void updateDatabase() {
+        dialog = ProgressDialog.show(this, "",
+                getResources().getString(R.string.data_progress_dialog_message));
+        IntentFilter intentFilter = new IntentFilter(DownloadService.BROADCAST_ACTION);
+        downloadReceiver = new DownloadFinishReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(downloadReceiver, intentFilter);
+
+        firebaseDownloadManager = new FirebaseDownloadManager(this);
+        firebaseDownloadManager.initAll(new FirebaseDownloadManager.FirebaseDownloadListener() {
+            @Override
+            public void onFinished(Object object) {
+                groupFragment = GroupFragment.newInstance();
+
+                fragmentManager.beginTransaction()
+                        .add(R.id.frame_content, groupFragment)
+                        .commit();
+            }
+
+            @Override
+            public void onFailed() {
+
+            }
+        });
     }
 
     public class DownloadFinishReceiver extends BroadcastReceiver {

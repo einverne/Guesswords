@@ -47,5 +47,6 @@
     <string name="setting_game_duration_title">游戏时长</string>
     <string name="setting_game_duration_summary">游戏历时时间可有90,180,300秒选择</string>
     <string name="nav_how_to_play">How to play</string>
+    <string name="nav_update_db">Update data</string>
 
 </resources>

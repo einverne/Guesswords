@@ -48,4 +48,5 @@
     <string name="setting_game_duration_title">Game Duration</string>
     <string name="setting_game_duration_summary">The duration of game</string>
     <string name="nav_how_to_play">How to play</string>
+    <string name="nav_update_db" >Update data</string>
 </resources>

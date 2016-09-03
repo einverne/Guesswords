@@ -23,8 +23,12 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_how_to_play"
-            android:icon="@drawable/ic_help_black_24dp"
+            android:icon="@drawable/ic_menu_help_black"
             android:title="@string/nav_how_to_play" />
+        <item
+            android:id="@+id/nav_update_db"
+            android:icon="@drawable/ic_menu_update_black"
+            android:title="@string/nav_update_db" />
         <item
             android:id="@+id/nav_setting"
             android:icon="@drawable/ic_menu_setting"
