@@ -78,6 +78,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="info.einverne.guesswords.MainActivity" />
         </activity>
+
+        <service android:name=".service.DownloadService" />
     </application>
 
 </manifest>

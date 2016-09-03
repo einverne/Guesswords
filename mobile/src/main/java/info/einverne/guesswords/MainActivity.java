@@ -1,12 +1,16 @@
 package info.einverne.guesswords;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,14 +25,12 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import info.einverne.guesswords.data.FirebaseDownloadManager;
 import info.einverne.guesswords.fragment.GameHistoryFragment;
 import info.einverne.guesswords.fragment.GroupFragment;
+import info.einverne.guesswords.service.DownloadService;
 import timber.log.Timber;
 
 public class MainActivity extends BaseActivity
@@ -41,13 +43,16 @@ public class MainActivity extends BaseActivity
     private View view_before_login;
     private View view_after_login;
     private ImageView imageViewAvatar;
+    private ProgressDialog dialog;
 
     // fragment
     private FragmentManager fragmentManager;
     private GroupFragment groupFragment;
     private Fragment historyFragment;
 
+    //data
     private FirebaseDownloadManager firebaseDownloadManager;
+    private DownloadFinishReceiver downloadReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,39 +86,39 @@ public class MainActivity extends BaseActivity
         view_before_login = navHeader.findViewById(R.id.nav_header_before_login);
         view_after_login = navHeader.findViewById(R.id.nav_header_after_login);
 
-        final ProgressDialog loading = ProgressDialog.show(this, "",
-                getResources().getString(R.string.data_progress_dialog_message));
-//        database.getReference("zh").addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                loading.dismiss();
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                loading.dismiss();
-//                Toast.makeText(MainActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
+        groupFragment = GroupFragment.newInstance();
 
-        firebaseDownloadManager = new FirebaseDownloadManager(this);
-        firebaseDownloadManager.initGroups(new FirebaseDownloadManager.FirebaseDownloadListener() {
-            @Override
-            public void onFinished(Object object) {
-                loading.dismiss();
-                groupFragment = GroupFragment.newInstance();
+        fragmentManager.beginTransaction()
+                .add(R.id.frame_content, groupFragment)
+                .commit();
+        
+        // first time download all words from server
+        boolean isFirstTimeInit = getDeviceSharedPreferences().getBoolean("isFirstTimeInit", true);
+        if (isFirstTimeInit) {
+            dialog = ProgressDialog.show(this, "",
+                    getResources().getString(R.string.data_progress_dialog_message));
+            IntentFilter intentFilter = new IntentFilter(DownloadService.BROADCAST_ACTION);
+            downloadReceiver = new DownloadFinishReceiver();
+            LocalBroadcastManager.getInstance(this).registerReceiver(downloadReceiver, intentFilter);
 
-                fragmentManager.beginTransaction()
-                        .add(R.id.frame_content, groupFragment)
-                        .commit();
-            }
+            firebaseDownloadManager = new FirebaseDownloadManager(this);
+            firebaseDownloadManager.initAll(new FirebaseDownloadManager.FirebaseDownloadListener() {
+                @Override
+                public void onFinished(Object object) {
+                    groupFragment = GroupFragment.newInstance();
 
-            @Override
-            public void onFailed() {
+                    fragmentManager.beginTransaction()
+                            .add(R.id.frame_content, groupFragment)
+                            .commit();
+                }
 
-            }
-        });
+                @Override
+                public void onFailed() {
+
+                }
+            });
+            setDeviceSharedPreferences("isFirstTimeInit", false);
+        }
     }
 
     @Override
@@ -183,6 +188,14 @@ public class MainActivity extends BaseActivity
     protected void onResume() {
         super.onResume();
         Timber.d("onResume");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (downloadReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(downloadReceiver);
+        }
     }
 
     @Override
@@ -277,4 +290,22 @@ public class MainActivity extends BaseActivity
     private void startSetting() {
         startActivity(new Intent(this, SettingsActivity.class));
     }
+
+    public class DownloadFinishReceiver extends BroadcastReceiver {
+
+        // Called when the BroadcastReceiver gets an Intent it's registered to receive
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction() == DownloadService.BROADCAST_ACTION) {
+                Timber.d("receive broadcast");
+                dialog.dismiss();
+                groupFragment = GroupFragment.newInstance();
+
+                fragmentManager.beginTransaction()
+                        .add(R.id.frame_content, groupFragment)
+                        .commit();
+            }
+        }
+    }
+
 }

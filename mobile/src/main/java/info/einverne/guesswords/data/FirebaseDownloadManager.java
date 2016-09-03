@@ -1,6 +1,7 @@
 package info.einverne.guesswords.data;
 
 import android.content.Context;
+import android.content.Intent;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -12,18 +13,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import info.einverne.guesswords.service.DownloadService;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import timber.log.Timber;
 
 /**
  * Created by einverne on 9/2/16.
- *
+ * <p>
  * This class use to manager download from web server
  */
 public class FirebaseDownloadManager {
+
+    public static final String BASE_URL = "https://evguesswords.firebaseapp.com/";
 
     private OkHttpClient client;
     private Context context;
@@ -39,12 +44,12 @@ public class FirebaseDownloadManager {
         void onFailed();
     }
 
-    public void initGroups(final FirebaseDownloadListener listener) {
+    public void initAll(final FirebaseDownloadListener listener) {
         Request request = new Request.Builder()
-                .url("https://evguesswords.firebaseapp.com/groups.json")
+                .url(BASE_URL + "groups.json")
                 .build();
 
-        client.newCall(request).enqueue(new Callback() {
+        Callback callback = new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 if (listener != null) {
@@ -75,22 +80,28 @@ public class FirebaseDownloadManager {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    if (listener != null) {
-                        listener.onFinished(null);
+                    ArrayList<String> groupIds = new ArrayList<>();
+                    for (GroupItem item : groupItemsList) {
+
+                        groupIds.add(item.groupId);
                     }
+                    Intent intent = new Intent(context, DownloadService.class);
+                    intent.putStringArrayListExtra(DownloadService.GROUP_IDS, groupIds);
+                    context.startService(intent);
                 } else {
                     if (listener != null) {
                         listener.onFailed();
                     }
                 }
             }
-        });
+        };
+
+        client.newCall(request).enqueue(callback);
     }
 
     public void initDb(final Context context, String url, final FirebaseDownloadListener listener) {
-        client = new OkHttpClient();
         final Request request = new Request.Builder()
-                .url("https://evguesswords.firebaseapp.com/sanguosha.txt")
+                .url(BASE_URL + "sanguosha.txt")
                 .build();
 
         client.newCall(request).enqueue(new Callback() {

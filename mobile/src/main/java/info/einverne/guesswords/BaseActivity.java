@@ -23,8 +23,6 @@ public class BaseActivity extends AppCompatActivity {
 
     protected FirebaseDatabase database;
 
-    protected SharedPreferences sharedPreferences;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +43,6 @@ public class BaseActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance();
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     @Override
@@ -60,5 +57,29 @@ public class BaseActivity extends AppCompatActivity {
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
+    }
+
+    /**
+     * 获取默认 SharedPreferences
+     *
+     * @return 默认
+     */
+    public SharedPreferences getDefaultSharedPreferences() {
+        return PreferenceManager.getDefaultSharedPreferences(this);
+    }
+
+    /**
+     * 获取设备相关
+     *
+     * @return 设备相关
+     */
+    public SharedPreferences getDeviceSharedPreferences() {
+        return getSharedPreferences("device_related", MODE_PRIVATE);
+    }
+
+    public void setDeviceSharedPreferences(String key, boolean value) {
+        SharedPreferences.Editor editor = getDeviceSharedPreferences().edit();
+        editor.putBoolean(key, value);
+        editor.apply();
     }
 }

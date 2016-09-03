@@ -10,16 +10,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,6 +22,7 @@ import java.util.TimerTask;
 import info.einverne.guesswords.data.HistoryData;
 import info.einverne.guesswords.data.SingleData;
 import info.einverne.guesswords.data.SingleWord;
+import info.einverne.guesswords.data.WordDbManager;
 import info.einverne.guesswords.data.WordsManager;
 import info.einverne.guesswords.detector.ScreenFaceDetector;
 import timber.log.Timber;
@@ -50,12 +46,14 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
     private int nLeftTime;
 
     private String groupId;
-    private FirebaseDatabase database;
     List<SingleWord> words = new ArrayList<>();
     List<SingleWord> randomWords = new ArrayList<>();
     private int index = 0;
 
     private ArrayList<SingleData> gameRecord = new ArrayList<>();
+
+    private WordDbManager wordDbManager;
+    private ArrayList<String> randomWordsFromDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +64,7 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_game);
 
-        database = FirebaseDatabase.getInstance();
+        wordDbManager = new WordDbManager(this);
 
         groupId = getIntent().getStringExtra(GROUP_ID);
 
@@ -84,22 +82,23 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
         Timber.d("groupId " + groupId);
         final ProgressDialog loading = ProgressDialog.show(this, "", "loading");
 
+        randomWordsFromDb = wordDbManager.getRandomWordsByGroupId(groupId, 100);
 
-        WordsManager.getWordsByGroupId(database, groupId, new WordsManager.QueryFinishedListener() {
-            @Override
-            public void onSuccess(Object object) {
-                words.addAll((ArrayList<SingleWord>) object);
-                getRandomWords();
-                loading.dismiss();
-                startGame();
-
-            }
-
-            @Override
-            public void onFailed(DatabaseError error) {
-
-            }
-        });
+//        WordsManager.getWordsByGroupId(database, groupId, new WordsManager.QueryFinishedListener() {
+//            @Override
+//            public void onSuccess(Object object) {
+//                words.addAll((ArrayList<SingleWord>) object);
+//                getRandomWords();
+//                loading.dismiss();
+//                startGame();
+//
+//            }
+//
+//            @Override
+//            public void onFailed(DatabaseError error) {
+//
+//            }
+//        });
     }
 
     private void getRandomWords() {
@@ -126,7 +125,7 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
         isGameOver = false;
         index = 0;
         nPrepareTime = 4;
-        nLeftTime = Integer.parseInt(sharedPreferences.getString(SettingsActivity.GAME_DURATION, "90"));
+        nLeftTime = Integer.parseInt(getDefaultSharedPreferences().getString(SettingsActivity.GAME_DURATION, "90"));
         tv_replay.setVisibility(View.GONE);
         startTimerPrepare();
     }
@@ -188,7 +187,7 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
             }
         });
         FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null && !gameRecord.isEmpty()){
+        if (user != null && !gameRecord.isEmpty()) {
             long currentTime = System.currentTimeMillis();
             HistoryData historyData = new HistoryData(currentTime, gameRecord);
             database.getReference("users").child(user.getUid()).child("history").child(Long.toString(currentTime)).setValue(historyData);
