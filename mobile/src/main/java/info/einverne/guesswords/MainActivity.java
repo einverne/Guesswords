@@ -302,7 +302,7 @@ public class MainActivity extends BaseActivity
         // Called when the BroadcastReceiver gets an Intent it's registered to receive
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction() == DownloadService.BROADCAST_ACTION) {
+            if (intent.getAction().equals(DownloadService.BROADCAST_ACTION)) {
                 Timber.d("receive broadcast");
                 if (intent.getIntExtra(DownloadService.BROADCAST_PARA, 0) == DownloadService.BROADCAST_NO_NEED_UPDATE) {
                     Toast.makeText(context, "already update, no need to update", Toast.LENGTH_SHORT).show();

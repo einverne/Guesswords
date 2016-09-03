@@ -125,6 +125,9 @@ public class WordDbManager {
 
     public ArrayList<String> getRandomWordsByGroupId(String groupId, int count) {
         if (groupId == null || count <= 0) return null;
+        if (groupId.equals("random")) {
+            return getRandomWords(100);
+        }
         ArrayList<String> wordsList = new ArrayList<>();
         String orderBy = "RANDOM()";
         Cursor cursor = db.query(WordEntry.TABLE_NAME,
