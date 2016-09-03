@@ -22,7 +22,6 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import timber.log.Timber;
 
 /**
  * Created by einverne on 9/2/16.
@@ -70,24 +69,22 @@ public class FirebaseDownloadManager {
                 if (response.isSuccessful()) {
                     String json = response.body().string();
                     ArrayList<GroupItem> groupItemsList = new ArrayList<GroupItem>();
+                    String language = "";
+                    int version = 0;
                     try {
                         JSONObject jsonObject = new JSONObject(json);
                         SharedPreferences sharedPreferences = context.getSharedPreferences(BaseActivity.DEVICE_RELATED, Context.MODE_PRIVATE);
-                        String language = jsonObject.getString("language");
-                        int version = jsonObject.getInt("version");
+                        language = jsonObject.getString("language");
+                        version = jsonObject.getInt("version");
                         if (sharedPreferences.getInt("version", 0) >= version) {
                             if (listener != null) {
                                 listener.onFinished(null);
                             }
-                            Intent local = new Intent(DownloadService.BROADCAST_ACTION);
+                            Intent local = new Intent(DownloadService.BROADCAST_FINISH_ACTION);
                             local.putExtra(DownloadService.BROADCAST_PARA, DownloadService.BROADCAST_NO_NEED_UPDATE);
                             LocalBroadcastManager.getInstance(context).sendBroadcast(local);
                             return;
                         }
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putInt("version", version);
-                        editor.putString("language", language);
-                        editor.apply();
 
                         JSONArray groups = jsonObject.getJSONArray("groups");
                         for (int i = 0; i < groups.length(); i++) {
@@ -100,6 +97,7 @@ public class FirebaseDownloadManager {
                         WordDbManager manager = new WordDbManager(context);
                         manager.clearGroups();
                         manager.saveGroups(groupItemsList);
+                        manager.close();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -110,6 +108,8 @@ public class FirebaseDownloadManager {
                     }
                     Intent intent = new Intent(context, DownloadService.class);
                     intent.putStringArrayListExtra(DownloadService.GROUP_IDS, groupIds);
+                    intent.putExtra(DownloadService.VERSION, version);
+                    intent.putExtra(DownloadService.LANGUAGE, language);
                     context.startService(intent);
                 } else {
                     if (listener != null) {

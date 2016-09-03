@@ -176,6 +176,7 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
     @Override
     protected void onStop() {
         super.onStop();
+        wordDbManager.close();
     }
 
     @Override
@@ -198,8 +199,8 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
         if (!isReady || isGameOver) return;
         if (index >= randomWordsFromDb.size()) return;
         gameRecord.add(new SingleData(randomWordsFromDb.get(index), false));
-        index++;
         tv_guessing_word.setText(randomWordsFromDb.get(index));
+        index++;
     }
 
     @Override
@@ -208,8 +209,8 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
         if (!isReady || isGameOver) return;
         if (index >= randomWordsFromDb.size()) return;
         gameRecord.add(new SingleData(randomWordsFromDb.get(index), true));
-        index++;
         tv_guessing_word.setText(randomWordsFromDb.get(index));
+        index++;
     }
 
     private void initSensor() {

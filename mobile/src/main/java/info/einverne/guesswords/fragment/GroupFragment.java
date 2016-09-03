@@ -56,6 +56,7 @@ public class GroupFragment extends BaseFragment {
     @Override
     public void onStop() {
         super.onStop();
+        mDbManager.close();
     }
 
     @Override

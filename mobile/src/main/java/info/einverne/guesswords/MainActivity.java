@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -45,7 +46,7 @@ public class MainActivity extends BaseActivity
     private View view_before_login;
     private View view_after_login;
     private ImageView imageViewAvatar;
-    private ProgressDialog dialog;
+    private ProgressDialog progressDialog;
 
     // fragment
     private FragmentManager fragmentManager;
@@ -277,9 +278,10 @@ public class MainActivity extends BaseActivity
     }
 
     private void updateDatabase() {
-        dialog = ProgressDialog.show(this, "",
+        progressDialog = ProgressDialog.show(this, "",
                 getResources().getString(R.string.data_progress_dialog_message));
-        IntentFilter intentFilter = new IntentFilter(DownloadService.BROADCAST_ACTION);
+        IntentFilter intentFilter = new IntentFilter(DownloadService.BROADCAST_FINISH_ACTION);
+        intentFilter.addAction(DownloadService.BROADCAST_ING_ACTION);
         downloadReceiver = new DownloadFinishReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(downloadReceiver, intentFilter);
 
@@ -302,18 +304,26 @@ public class MainActivity extends BaseActivity
         // Called when the BroadcastReceiver gets an Intent it's registered to receive
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(DownloadService.BROADCAST_ACTION)) {
-                Timber.d("receive broadcast");
-                if (intent.getIntExtra(DownloadService.BROADCAST_PARA, 0) == DownloadService.BROADCAST_NO_NEED_UPDATE) {
-                    Toast.makeText(context, "already update, no need to update", Toast.LENGTH_SHORT).show();
-                }
-                dialog.dismiss();
-                groupFragment = GroupFragment.newInstance();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.frame_content, groupFragment)
-                        .commit();
+            String action = intent.getAction();
+            switch (action) {
+                case DownloadService.BROADCAST_ING_ACTION:
+                    Timber.d("");
+                    String groupId = intent.getStringExtra(DownloadService.BROADCAST_CURRENT_DOWNLOADING);
+                    progressDialog.setMessage("Downloading " + groupId);
+                    break;
+                case DownloadService.BROADCAST_FINISH_ACTION:
+                    Timber.d("receive broadcast");
+                    if (intent.getIntExtra(DownloadService.BROADCAST_PARA, 0) == DownloadService.BROADCAST_NO_NEED_UPDATE) {
+                        Toast.makeText(context, "already update, no need to update", Toast.LENGTH_SHORT).show();
+                    }
+                    progressDialog.dismiss();
+                    groupFragment = GroupFragment.newInstance();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.frame_content, groupFragment)
+                            .commit();
 
-                LocalBroadcastManager.getInstance(getBaseContext()).unregisterReceiver(downloadReceiver);
+                    LocalBroadcastManager.getInstance(getBaseContext()).unregisterReceiver(downloadReceiver);
+                    break;
             }
         }
     }
