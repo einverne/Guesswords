@@ -80,6 +80,16 @@
         </activity>
 
         <service android:name=".service.DownloadService" />
+
+        <activity
+            android:name=".MyWordsActivity"
+            android:label="@string/title_activity_my_words"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="info.einverne.guesswords.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

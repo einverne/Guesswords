@@ -248,8 +248,13 @@ public class MainActivity extends BaseActivity
                 break;
             case R.id.nav_my_words:
                 Timber.d("nav my words clicked");
-                Toast.makeText(MainActivity.this, "Add your own words will be available next version", Toast.LENGTH_SHORT).show();
-
+                FirebaseUser user = mAuth.getCurrentUser();
+                if (user == null) {
+                    Toast.makeText(this, "Login first", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                } else {
+                    startActivity(new Intent(MainActivity.this, MyWordsActivity.class));
+                }
                 break;
             case R.id.nav_how_to_play:
                 Timber.d("nav how to play");

@@ -52,6 +52,12 @@ public class GroupRecyclerAdapter extends RecyclerView.Adapter<GroupRecyclerAdap
         return groupItems.size();
     }
 
+    private void startGame(String groupId) {
+        Intent intent = new Intent(context, GameActivity.class);
+        intent.putExtra(GameActivity.GROUP_ID, groupId);
+        context.startActivity(intent);
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView groupName;
 
@@ -60,11 +66,5 @@ public class GroupRecyclerAdapter extends RecyclerView.Adapter<GroupRecyclerAdap
             groupName = (TextView) itemView.findViewById(R.id.groupName);
         }
 
-    }
-
-    private void startGame(String groupId) {
-        Intent intent = new Intent(context, GameActivity.class);
-        intent.putExtra(GameActivity.GROUP_ID, groupId);
-        context.startActivity(intent);
     }
 }
