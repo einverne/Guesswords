@@ -31,13 +31,13 @@ public class FirebaseDownloadManager {
         context = c;
     }
 
-    public interface WordsDownloadListener {
-        void onFinished();
+    public interface FirebaseDownloadListener {
+        void onFinished(Object object);
 
         void onFailed();
     }
 
-    public void initGroups() {
+    public void initGroups(final FirebaseDownloadListener listener) {
         Request request = new Request.Builder()
                 .url("https://evguesswords.firebaseapp.com/groups.json")
                 .build();
@@ -45,13 +45,16 @@ public class FirebaseDownloadManager {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
+                if (listener != null) {
+                    listener.onFailed();
+                }
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String json = response.body().string();
+                    ArrayList<GroupItem> groupItemsList = new ArrayList<GroupItem>();
                     try {
                         JSONObject jsonObject = new JSONObject(json);
                         String language = jsonObject.getString("language");
@@ -59,18 +62,29 @@ public class FirebaseDownloadManager {
                         JSONArray groups = jsonObject.getJSONArray("groups");
                         for (int i = 0; i < groups.length(); i++) {
                             JSONObject oneGroup = groups.getJSONObject(i);
-                            oneGroup.getString("groupId");
-                            oneGroup.getString("groupName");
+                            String groupId = oneGroup.getString("groupId");
+                            String groupName = oneGroup.getString("groupName");
+                            GroupItem groupItem = new GroupItem(groupId, groupName);
+                            groupItemsList.add(groupItem);
                         }
+                        WordDbManager manager = new WordDbManager(context);
+                        manager.saveGroups(groupItemsList);
                     } catch (JSONException e) {
                         e.printStackTrace();
+                    }
+                    if (listener != null) {
+                        listener.onFinished(null);
+                    }
+                } else {
+                    if (listener != null) {
+                        listener.onFailed();
                     }
                 }
             }
         });
     }
 
-    public void initDb(final Context context, String url, final WordsDownloadListener listener) {
+    public void initDb(final Context context, String url, final FirebaseDownloadListener listener) {
         client = new OkHttpClient();
         final Request request = new Request.Builder()
                 .url("https://evguesswords.firebaseapp.com/sanguosha.txt")
@@ -93,7 +107,7 @@ public class FirebaseDownloadManager {
                     WordDbManager manager = new WordDbManager(context);
                     manager.addWords("sanguosha", wordList);
                     if (listener != null) {
-                        listener.onFinished();
+                        listener.onFinished(null);
                     }
                 } else {
                     Toast.makeText(context, "Error Response code " + response.code(), Toast.LENGTH_SHORT).show();

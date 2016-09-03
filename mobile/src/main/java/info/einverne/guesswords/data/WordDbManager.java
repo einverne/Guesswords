@@ -21,6 +21,47 @@ public class WordDbManager {
     }
 
     /**
+     * Save groups into database
+     *
+     * @param groupItems groupItems
+     */
+    public void saveGroups(ArrayList<GroupItem> groupItems) {
+        db.beginTransaction();
+        for (GroupItem groupItem : groupItems) {
+            ContentValues values = new ContentValues();
+            values.put(GroupEntry.COLUMN_NAME_GROUP_ID, groupItem.groupId);
+            values.put(GroupEntry.COLUMN_NAME_GROUP_CONTENT, groupItem.groupName);
+            db.insert(GroupEntry.TABLE_NAME, null, values);
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
+    /**
+     * read all groups from database
+     *
+     * @return all groupItems
+     */
+    public ArrayList<GroupItem> getGroups() {
+        ArrayList<GroupItem> groupItems = new ArrayList<>();
+        Cursor cursor = db.query(GroupEntry.TABLE_NAME,
+                new String[]{GroupEntry.COLUMN_NAME_GROUP_ID, GroupEntry.COLUMN_NAME_GROUP_CONTENT},
+                null,
+                null,
+                null,
+                null,
+                null);
+        while (cursor.moveToNext()) {
+            int columnIndex = cursor.getColumnIndexOrThrow(GroupEntry.COLUMN_NAME_GROUP_ID);
+            String groupID = cursor.getString(columnIndex);
+            columnIndex = cursor.getColumnIndexOrThrow(GroupEntry.COLUMN_NAME_GROUP_CONTENT);
+            String groupName = cursor.getString(columnIndex);
+            groupItems.add(new GroupItem(groupID, groupName));
+        }
+        return groupItems;
+    }
+
+    /**
      * Add words to db
      *
      * @param words words list
@@ -29,9 +70,9 @@ public class WordDbManager {
         db.beginTransaction();
         for (SingleWord word : words) {
             ContentValues values = new ContentValues();
-            values.put(GroupEntry.COLUMN_NAME_WORD_GROUP, groupName);
-            values.put(GroupEntry.COLUMN_NAME_WORD_CONTENT, word.wordString);
-            db.insert(GroupEntry.TABLE_NAME, null, values);
+            values.put(WordEntry.COLUMN_NAME_WORD_GROUP, groupName);
+            values.put(WordEntry.COLUMN_NAME_WORD_CONTENT, word.wordString);
+            db.insert(WordEntry.TABLE_NAME, null, values);
         }
         db.setTransactionSuccessful();
         db.endTransaction();
@@ -41,9 +82,9 @@ public class WordDbManager {
         db.beginTransaction();
         for (String word : words) {
             ContentValues values = new ContentValues();
-            values.put(GroupEntry.COLUMN_NAME_WORD_GROUP, groupName);
-            values.put(GroupEntry.COLUMN_NAME_WORD_CONTENT, word);
-            db.insert(GroupEntry.TABLE_NAME, null, values);
+            values.put(WordEntry.COLUMN_NAME_WORD_GROUP, groupName);
+            values.put(WordEntry.COLUMN_NAME_WORD_CONTENT, word);
+            db.insert(WordEntry.TABLE_NAME, null, values);
         }
         db.setTransactionSuccessful();
         db.endTransaction();
@@ -53,16 +94,16 @@ public class WordDbManager {
         if (groupName == null || count <= 0) return null;
         ArrayList<String> wordsList = new ArrayList<>();
         String orderBy = "RANDOM()";
-        Cursor cursor = db.query(GroupEntry.TABLE_NAME,
-                new String[]{GroupEntry.COLUMN_NAME_WORD_CONTENT},
-                GroupEntry.COLUMN_NAME_WORD_GROUP + " = ?",
+        Cursor cursor = db.query(WordEntry.TABLE_NAME,
+                new String[]{WordEntry.COLUMN_NAME_WORD_CONTENT},
+                WordEntry.COLUMN_NAME_WORD_GROUP + " = ?",
                 new String[]{groupName},
                 null,
                 null,
                 orderBy,
                 Integer.toString(count));
         while (cursor.moveToNext()) {
-            int columnIndex = cursor.getColumnIndexOrThrow(GroupEntry.COLUMN_NAME_WORD_CONTENT);
+            int columnIndex = cursor.getColumnIndexOrThrow(WordEntry.COLUMN_NAME_WORD_CONTENT);
             String word = cursor.getString(columnIndex);
             wordsList.add(word);
         }
@@ -73,8 +114,8 @@ public class WordDbManager {
         if (count <= 0) return null;
         ArrayList<String> wordsList = new ArrayList<>();
         String orderBy = "RANDOM()";
-        Cursor cursor = db.query(GroupEntry.TABLE_NAME,
-                new String[]{GroupEntry.COLUMN_NAME_WORD_CONTENT},
+        Cursor cursor = db.query(WordEntry.TABLE_NAME,
+                new String[]{WordEntry.COLUMN_NAME_WORD_CONTENT},
                 null,
                 null,
                 null,
@@ -82,7 +123,7 @@ public class WordDbManager {
                 orderBy,
                 Integer.toString(count));
         while (cursor.moveToNext()) {
-            int columnIndex = cursor.getColumnIndexOrThrow(GroupEntry.COLUMN_NAME_WORD_CONTENT);
+            int columnIndex = cursor.getColumnIndexOrThrow(WordEntry.COLUMN_NAME_WORD_CONTENT);
             String word = cursor.getString(columnIndex);
             wordsList.add(word);
         }

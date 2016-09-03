@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import info.einverne.guesswords.data.FirebaseDownloadManager;
 import info.einverne.guesswords.fragment.GameHistoryFragment;
 import info.einverne.guesswords.fragment.GroupFragment;
 import timber.log.Timber;
@@ -46,6 +47,8 @@ public class MainActivity extends BaseActivity
     private GroupFragment groupFragment;
     private Fragment historyFragment;
 
+    private FirebaseDownloadManager firebaseDownloadManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,12 +56,6 @@ public class MainActivity extends BaseActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         fragmentManager = getSupportFragmentManager();
-
-        groupFragment = GroupFragment.newInstance();
-
-        fragmentManager.beginTransaction()
-                .add(R.id.frame_content, groupFragment)
-                .commit();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -86,17 +83,35 @@ public class MainActivity extends BaseActivity
 
         final ProgressDialog loading = ProgressDialog.show(this, "",
                 getResources().getString(R.string.data_progress_dialog_message));
-        database.getReference("zh").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+//        database.getReference("zh").addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//                loading.dismiss();
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                loading.dismiss();
+//                Toast.makeText(MainActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
+        firebaseDownloadManager = new FirebaseDownloadManager(this);
+        firebaseDownloadManager.initGroups(new FirebaseDownloadManager.FirebaseDownloadListener() {
+            @Override
+            public void onFinished(Object object) {
                 loading.dismiss();
+                groupFragment = GroupFragment.newInstance();
+
+                fragmentManager.beginTransaction()
+                        .add(R.id.frame_content, groupFragment)
+                        .commit();
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                loading.dismiss();
-                Toast.makeText(MainActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onFailed() {
+
             }
         });
     }
