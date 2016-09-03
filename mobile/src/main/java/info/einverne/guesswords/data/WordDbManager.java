@@ -38,6 +38,13 @@ public class WordDbManager {
     }
 
     /**
+     * delete all rows in groups table
+     */
+    public void clearGroups() {
+        db.delete(GroupEntry.TABLE_NAME, null, null);
+    }
+
+    /**
      * read all groups from database
      *
      * @return all groupItems

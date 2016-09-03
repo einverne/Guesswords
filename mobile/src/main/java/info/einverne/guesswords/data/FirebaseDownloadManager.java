@@ -20,6 +20,8 @@ import okhttp3.Response;
 
 /**
  * Created by einverne on 9/2/16.
+ *
+ * This class use to manager download from web server
  */
 public class FirebaseDownloadManager {
 
@@ -68,6 +70,7 @@ public class FirebaseDownloadManager {
                             groupItemsList.add(groupItem);
                         }
                         WordDbManager manager = new WordDbManager(context);
+                        manager.clearGroups();
                         manager.saveGroups(groupItemsList);
                     } catch (JSONException e) {
                         e.printStackTrace();
