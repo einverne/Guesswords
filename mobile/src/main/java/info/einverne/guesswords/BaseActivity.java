@@ -17,6 +17,7 @@ import timber.log.Timber;
  * Created by einverne on 8/23/16.
  */
 public class BaseActivity extends AppCompatActivity {
+    public static final String DEVICE_RELATED = "device_related";
 
     protected FirebaseAuth mAuth;
     protected FirebaseAuth.AuthStateListener mAuthListener;
@@ -74,7 +75,7 @@ public class BaseActivity extends AppCompatActivity {
      * @return 设备相关
      */
     public SharedPreferences getDeviceSharedPreferences() {
-        return getSharedPreferences("device_related", MODE_PRIVATE);
+        return getSharedPreferences(DEVICE_RELATED, MODE_PRIVATE);
     }
 
     public void setDeviceSharedPreferences(String key, boolean value) {

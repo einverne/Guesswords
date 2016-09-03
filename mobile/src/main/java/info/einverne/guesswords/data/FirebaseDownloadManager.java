@@ -2,6 +2,8 @@ package info.einverne.guesswords.data;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import info.einverne.guesswords.BaseActivity;
 import info.einverne.guesswords.service.DownloadService;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -44,6 +47,11 @@ public class FirebaseDownloadManager {
         void onFailed();
     }
 
+    /**
+     * download groups json file and update all groups of words
+     *
+     * @param listener call back when down load groups json file success or failed
+     */
     public void initAll(final FirebaseDownloadListener listener) {
         Request request = new Request.Builder()
                 .url(BASE_URL + "groups.json")
@@ -64,8 +72,23 @@ public class FirebaseDownloadManager {
                     ArrayList<GroupItem> groupItemsList = new ArrayList<GroupItem>();
                     try {
                         JSONObject jsonObject = new JSONObject(json);
+                        SharedPreferences sharedPreferences = context.getSharedPreferences(BaseActivity.DEVICE_RELATED, Context.MODE_PRIVATE);
                         String language = jsonObject.getString("language");
                         int version = jsonObject.getInt("version");
+                        if (sharedPreferences.getInt("version", 0) >= version) {
+                            if (listener != null) {
+                                listener.onFinished(null);
+                            }
+                            Intent local = new Intent(DownloadService.BROADCAST_ACTION);
+                            local.putExtra(DownloadService.BROADCAST_PARA, DownloadService.BROADCAST_NO_NEED_UPDATE);
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(local);
+                            return;
+                        }
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putInt("version", version);
+                        editor.putString("language", language);
+                        editor.apply();
+
                         JSONArray groups = jsonObject.getJSONArray("groups");
                         for (int i = 0; i < groups.length(); i++) {
                             JSONObject oneGroup = groups.getJSONObject(i);

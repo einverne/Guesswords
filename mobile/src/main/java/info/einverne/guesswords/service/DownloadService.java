@@ -23,6 +23,9 @@ import timber.log.Timber;
 public class DownloadService extends IntentService {
 
     public static final String BROADCAST_ACTION = "info.einverne.guesswords.BROADCAST";
+    // if para is 0, there is no need to update, otherwise 1 is updated local
+    public static final String BROADCAST_PARA = "BROADCAST_PARA";
+    public static final int BROADCAST_NO_NEED_UPDATE = 0;
     public static final String GROUP_IDS = "GROUP_IDS";
 
     public DownloadService() {
@@ -55,11 +58,10 @@ public class DownloadService extends IntentService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
         }
 
         Intent local = new Intent(BROADCAST_ACTION);
+        local.putExtra(BROADCAST_PARA, 1);
         LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(local);
 
     }

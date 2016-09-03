@@ -36,6 +36,8 @@ import timber.log.Timber;
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+
+    private static final String IS_FIRST_TIME_INIT = "isFirstTimeInit";
     // UI
     private NavigationView navigationView;
     private DrawerLayout drawer;
@@ -86,17 +88,17 @@ public class MainActivity extends BaseActivity
         view_before_login = navHeader.findViewById(R.id.nav_header_before_login);
         view_after_login = navHeader.findViewById(R.id.nav_header_after_login);
 
-        groupFragment = GroupFragment.newInstance();
-
-        fragmentManager.beginTransaction()
-                .add(R.id.frame_content, groupFragment)
-                .commit();
 
         // first time download all words from server
-        boolean isFirstTimeInit = getDeviceSharedPreferences().getBoolean("isFirstTimeInit", true);
+        boolean isFirstTimeInit = getDeviceSharedPreferences().getBoolean(IS_FIRST_TIME_INIT, true);
         if (isFirstTimeInit) {
             updateDatabase();
-            setDeviceSharedPreferences("isFirstTimeInit", false);
+            setDeviceSharedPreferences(IS_FIRST_TIME_INIT, false);
+        } else {
+            groupFragment = GroupFragment.newInstance();
+            fragmentManager.beginTransaction()
+                    .add(R.id.frame_content, groupFragment)
+                    .commit();
         }
     }
 
@@ -285,16 +287,12 @@ public class MainActivity extends BaseActivity
         firebaseDownloadManager.initAll(new FirebaseDownloadManager.FirebaseDownloadListener() {
             @Override
             public void onFinished(Object object) {
-                groupFragment = GroupFragment.newInstance();
 
-                fragmentManager.beginTransaction()
-                        .add(R.id.frame_content, groupFragment)
-                        .commit();
             }
 
             @Override
             public void onFailed() {
-
+                Toast.makeText(MainActivity.this, "update failed", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -306,12 +304,16 @@ public class MainActivity extends BaseActivity
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() == DownloadService.BROADCAST_ACTION) {
                 Timber.d("receive broadcast");
+                if (intent.getIntExtra(DownloadService.BROADCAST_PARA, 0) == DownloadService.BROADCAST_NO_NEED_UPDATE) {
+                    Toast.makeText(context, "already update, no need to update", Toast.LENGTH_SHORT).show();
+                }
                 dialog.dismiss();
                 groupFragment = GroupFragment.newInstance();
-
                 fragmentManager.beginTransaction()
-                        .add(R.id.frame_content, groupFragment)
+                        .replace(R.id.frame_content, groupFragment)
                         .commit();
+
+                LocalBroadcastManager.getInstance(getBaseContext()).unregisterReceiver(downloadReceiver);
             }
         }
     }
