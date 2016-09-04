@@ -8,6 +8,7 @@
     <string name="title_activity_login">登陆</string>
     <string name="title_activity_settings">设置</string>
     <string name="title_activity_about">关于</string>
+    <string name="title_activity_my_words">我的单词</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">邮箱</string>
@@ -36,6 +37,8 @@
     <string name="nav_my_words">自定义</string>
     <string name="nav_setting">设置</string>
     <string name="nav_about">关于</string>
+    <string name="nav_how_to_play">游戏指导</string>
+    <string name="nav_update_db">更新数据</string>
     <string name="action_add_group">增加</string>
     <string name="nav_header_login_before">点击头像登陆</string>
 
@@ -46,8 +49,6 @@
     <!-- Setting -->
     <string name="setting_game_duration_title">游戏时长</string>
     <string name="setting_game_duration_summary">游戏历时时间可有90,180,300秒选择</string>
-    <string name="nav_how_to_play">How to play</string>
-    <string name="nav_update_db">Update data</string>
-    <string name="game_no_more_words">No more words</string>
+    <string name="game_no_more_words">没有更多单词</string>
 
 </resources>
