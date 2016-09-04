@@ -21,13 +21,14 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 import info.einverne.guesswords.adapter.MyWordRecyclerAdapter;
+import info.einverne.guesswords.data.MyWordItem;
 import timber.log.Timber;
 
 public class MyWordsActivity extends BaseActivity {
 
     private RecyclerView myWordsRecyclerView;
     private FirebaseUser mUser;
-    private ArrayList<String> mWordList;
+    private ArrayList<MyWordItem> mWordList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,9 +75,9 @@ public class MyWordsActivity extends BaseActivity {
 
         myWordsRecyclerView = (RecyclerView) findViewById(R.id.myWordsRecyclerView);
         myWordsRecyclerView.setHasFixedSize(false);
-        myWordsRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        myWordsRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         mWordList = new ArrayList<>();
-        final MyWordRecyclerAdapter adapter = new MyWordRecyclerAdapter(mWordList);
+        final MyWordRecyclerAdapter adapter = new MyWordRecyclerAdapter(MyWordsActivity.this, database, mUser, mWordList);
         myWordsRecyclerView.setAdapter(adapter);
 
         database.getReference("users")
@@ -87,7 +88,7 @@ public class MyWordsActivity extends BaseActivity {
                 mWordList.clear();
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     String word = data.getValue(String.class);
-                    mWordList.add(word);
+                    mWordList.add(new MyWordItem(Long.parseLong(data.getKey()),word));
                 }
                 adapter.notifyDataSetChanged();
             }
