@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -22,6 +21,7 @@ import java.util.ArrayList;
 
 import info.einverne.guesswords.adapter.MyWordRecyclerAdapter;
 import info.einverne.guesswords.data.MyWordItem;
+import info.einverne.guesswords.data.WordDbManager;
 import timber.log.Timber;
 
 public class MyWordsActivity extends BaseActivity {
@@ -29,6 +29,7 @@ public class MyWordsActivity extends BaseActivity {
     private RecyclerView myWordsRecyclerView;
     private FirebaseUser mUser;
     private ArrayList<MyWordItem> mWordList;
+    private WordDbManager wordDbManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,7 @@ public class MyWordsActivity extends BaseActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mUser = mAuth.getCurrentUser();
+        wordDbManager = new WordDbManager(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -91,6 +93,8 @@ public class MyWordsActivity extends BaseActivity {
                     mWordList.add(new MyWordItem(Long.parseLong(data.getKey()),word));
                 }
                 adapter.notifyDataSetChanged();
+                wordDbManager.clearWordsByGroupId("custom");
+                wordDbManager.addWords("custom", getStringListToDb());
             }
 
             @Override
@@ -101,4 +105,17 @@ public class MyWordsActivity extends BaseActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        wordDbManager.close();
+    }
+
+    private ArrayList<String> getStringListToDb() {
+        ArrayList<String> wordList = new ArrayList<>();
+        for (MyWordItem item : mWordList) {
+            wordList.add(item.mWord);
+        }
+        return wordList;
+    }
 }
