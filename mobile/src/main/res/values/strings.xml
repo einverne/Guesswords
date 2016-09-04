@@ -51,4 +51,5 @@
     <string name="setting_game_duration_title">Game Duration</string>
     <string name="setting_game_duration_summary">The duration of game</string>
     <string name="game_no_more_words">No more words</string>
+    <string name="app_bar_welcome">Welcome</string>
 </resources>

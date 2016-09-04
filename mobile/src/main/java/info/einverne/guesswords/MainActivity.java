@@ -5,8 +5,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -19,7 +20,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +37,7 @@ import info.einverne.guesswords.data.FirebaseDownloadManager;
 import info.einverne.guesswords.fragment.GameHistoryFragment;
 import info.einverne.guesswords.fragment.GroupFragment;
 import info.einverne.guesswords.service.DownloadService;
+import info.einverne.guesswords.utils.Utils;
 import timber.log.Timber;
 
 public class MainActivity extends BaseActivity
@@ -49,6 +53,12 @@ public class MainActivity extends BaseActivity
     private View view_after_login;
     private ImageView imageViewAvatar;
     private ProgressDialog progressDialog;
+
+    private AppBarLayout appBarLayout;
+    private TextView title;
+    private FrameLayout frameLayout;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+    private ImageView app_bar_main_image;
 
     // fragment
     private FragmentManager fragmentManager;
@@ -66,8 +76,9 @@ public class MainActivity extends BaseActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         fragmentManager = getSupportFragmentManager();
+        initViews();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,13 +90,11 @@ public class MainActivity extends BaseActivity
             }
         });
 
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navHeader = navigationView.getHeaderView(0);
 
@@ -104,6 +113,80 @@ public class MainActivity extends BaseActivity
                     .add(R.id.frame_content, groupFragment)
                     .commit();
         }
+
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            public static final int ALPHA_ANIMATIONS_DURATION = 250;
+            public boolean mIsTheTitleContainerVisible = false;
+            public boolean mIsTheTitleVisible = false;
+
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                int maxScroll = appBarLayout.getTotalScrollRange();
+                float percentage = (float) Math.abs(verticalOffset) / (float) maxScroll;
+                // 完全展开为0.0 收拢时为 1.0
+                Timber.d("percentage " + percentage);
+
+                handleAlphaonTitle(percentage);
+                handleAlphaOnContainer(percentage);
+            }
+
+            private void handleAlphaonTitle(float percentage) {
+                if (percentage >= 0.7f) {
+                    if (!mIsTheTitleVisible) {
+                        startAlphaAnimation(title, ALPHA_ANIMATIONS_DURATION, View.VISIBLE);
+//                        startBackgroundAnimation(mToolbar, ALPHA_ANIMATIONS_DURATION, View.VISIBLE);
+                        mIsTheTitleVisible = true;
+                    }
+                } else {
+                    if (mIsTheTitleVisible) {
+                        startAlphaAnimation(title, ALPHA_ANIMATIONS_DURATION, View.INVISIBLE);
+//                        startBackgroundAnimation(mToolbar, ALPHA_ANIMATIONS_DURATION, View.INVISIBLE);
+                        mIsTheTitleVisible = false;
+                    }
+                }
+            }
+
+            private void handleAlphaOnContainer(float percentage) {
+                if (percentage >= 0.3f) {
+                    if (mIsTheTitleContainerVisible) {
+                        startAlphaAnimation(frameLayout, ALPHA_ANIMATIONS_DURATION, View.INVISIBLE);
+                        mIsTheTitleContainerVisible = false;
+                    }
+                } else {
+                    if (!mIsTheTitleContainerVisible) {
+                        startAlphaAnimation(frameLayout, ALPHA_ANIMATIONS_DURATION, View.VISIBLE);
+                        mIsTheTitleContainerVisible = true;
+                    }
+                }
+            }
+
+            private void startAlphaAnimation(View v, long duration, int visibility) {
+                AlphaAnimation alphaAnimation = (visibility == View.VISIBLE)
+                        ? new AlphaAnimation(0f, 1f)
+                        : new AlphaAnimation(1f, 0f);
+
+                alphaAnimation.setDuration(duration);
+                alphaAnimation.setFillAfter(true);
+                v.startAnimation(alphaAnimation);
+            }
+        });
+
+        collapsingToolbarLayout.setTitle(" ");
+        Picasso.with(this)
+                .load("https://evguesswords.firebaseapp.com/app_bar_main_image.jpg")
+                .resize((int) Utils.convertDpToPixel(600f, this), (int) Utils.convertDpToPixel(500f, this))
+                .centerCrop()
+                .into(app_bar_main_image);
+    }
+
+    private void initViews() {
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        appBarLayout = (AppBarLayout) findViewById(R.id.appbarLayout);
+        title = (TextView) findViewById(R.id.title);
+        frameLayout = (FrameLayout) findViewById(R.id.framelayout);
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayout);
+        app_bar_main_image = (ImageView) findViewById(R.id.app_bar_main_image);
     }
 
     @Override
