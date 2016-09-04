@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import info.einverne.guesswords.analytics.FAEvent;
+import info.einverne.guesswords.analytics.FAParam;
 import info.einverne.guesswords.data.HistoryData;
 import info.einverne.guesswords.data.SingleData;
 import info.einverne.guesswords.data.WordDbManager;
@@ -42,6 +44,7 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
 
     private WordDbManager wordDbManager;
     private ArrayList<String> randomWordsFromDb;
+    private long gameStartTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +84,7 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
     protected void onStart() {
         super.onStart();
         startGame();
+        gameStartTime = System.currentTimeMillis();
     }
 
     private void startGame() {
@@ -185,6 +189,14 @@ public class GameActivity extends BaseActivity implements ScreenFaceDetector.Lis
         initSensor();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        long lastTime = System.currentTimeMillis() - gameStartTime;
+        Bundle param = new Bundle();
+        param.putInt(FAParam.GAME_LAST_TIME_SECOND, (int) (lastTime / 1000));
+        firebaseAnalytics.logEvent(FAEvent.GAME_LAST_TIME, param);
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

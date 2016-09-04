@@ -28,6 +28,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
+import info.einverne.guesswords.analytics.FAEvent;
+import info.einverne.guesswords.analytics.FAParam;
 import info.einverne.guesswords.data.FirebaseDownloadManager;
 import info.einverne.guesswords.fragment.GameHistoryFragment;
 import info.einverne.guesswords.fragment.GroupFragment;
@@ -73,6 +75,7 @@ public class MainActivity extends BaseActivity
                 Intent intent = new Intent(MainActivity.this, GameActivity.class);
                 intent.putExtra(GameActivity.GROUP_ID, "random");
                 startActivity(intent);
+                firebaseAnalytics.logEvent(FAEvent.RANDOM_PRESSED, null);
             }
         });
 
@@ -125,7 +128,7 @@ public class MainActivity extends BaseActivity
             btnLogout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Timber.d("logout");
+                    firebaseAnalytics.logEvent(FAEvent.NAV_LOG_OUT_PRESSED, null);
                     if (user.isAnonymous()) {
                         mAuth.signOut();
                     } else {
@@ -160,6 +163,7 @@ public class MainActivity extends BaseActivity
                 @Override
                 public void onClick(View view) {
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    firebaseAnalytics.logEvent(FAEvent.NAV_AVATAR_PRESSED, null);
                 }
             });
         }
@@ -233,18 +237,23 @@ public class MainActivity extends BaseActivity
                 fragmentManager.beginTransaction()
                         .replace(R.id.frame_content, groupFragment)
                         .commit();
-
+                firebaseAnalytics.logEvent(FAEvent.NAV_GROUP_PRESSED, null);
                 break;
             case R.id.nav_game_history:
                 if (mAuth.getCurrentUser() == null) {
                     startActivity(new Intent(this, LoginActivity.class));
+                    Bundle param = new Bundle();
+                    param.putBoolean(FAParam.HISTORY_PRESSED_IS_LOGIN, false);
+                    firebaseAnalytics.logEvent(FAEvent.NAV_HISTORY_PRESSED, param);
                 } else {
                     historyFragment = GameHistoryFragment.newInstance(mAuth.getCurrentUser().getUid());
                     fragmentManager.beginTransaction()
                             .replace(R.id.frame_content, historyFragment)
                             .commit();
+                    Bundle param = new Bundle();
+                    param.putBoolean(FAParam.HISTORY_PRESSED_IS_LOGIN, true);
+                    firebaseAnalytics.logEvent(FAEvent.NAV_HISTORY_PRESSED, param);
                 }
-
                 break;
             case R.id.nav_my_words:
                 Timber.d("nav my words clicked");
@@ -252,25 +261,35 @@ public class MainActivity extends BaseActivity
                 if (user == null) {
                     Toast.makeText(this, "Login first", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    Bundle param = new Bundle();
+                    param.putBoolean(FAParam.MY_WORDS_PRESSED_IS_LOGIN, false);
+                    firebaseAnalytics.logEvent(FAEvent.NAV_MY_WORDS_PRESSED, param);
                 } else {
                     startActivity(new Intent(MainActivity.this, MyWordsActivity.class));
+                    Bundle param = new Bundle();
+                    param.putBoolean(FAParam.MY_WORDS_PRESSED_IS_LOGIN, true);
+                    firebaseAnalytics.logEvent(FAEvent.NAV_MY_WORDS_PRESSED, param);
                 }
                 break;
             case R.id.nav_how_to_play:
                 Timber.d("nav how to play");
                 startActivity(new Intent(MainActivity.this, HowToPlayActivity.class));
+                firebaseAnalytics.logEvent(FAEvent.NAV_HOW_TO_PLAY_PRESSED, null);
                 break;
             case R.id.nav_update_db:
                 updateDatabase();
                 navigationView.setCheckedItem(R.id.group_main);
+                firebaseAnalytics.logEvent(FAEvent.NAV_UPDATE_DATA_PRESSED, null);
                 break;
             case R.id.nav_setting:
                 Timber.d("nav setting clicked");
                 startSetting();
+                firebaseAnalytics.logEvent(FAEvent.NAV_SETTING_PRESSED, null);
                 break;
             case R.id.nav_about:
                 Timber.d("nav about clicked");
                 startActivity(new Intent(MainActivity.this, AboutActivity.class));
+                firebaseAnalytics.logEvent(FAEvent.NAV_ABOUT_PRESSED, null);
                 break;
         }
 

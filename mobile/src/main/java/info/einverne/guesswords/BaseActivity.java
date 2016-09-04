@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
@@ -23,6 +24,7 @@ public class BaseActivity extends AppCompatActivity {
     protected FirebaseAuth.AuthStateListener mAuthListener;
 
     protected FirebaseDatabase database;
+    public FirebaseAnalytics firebaseAnalytics;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,6 +45,7 @@ public class BaseActivity extends AppCompatActivity {
         };
 
         database = FirebaseDatabase.getInstance();
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override

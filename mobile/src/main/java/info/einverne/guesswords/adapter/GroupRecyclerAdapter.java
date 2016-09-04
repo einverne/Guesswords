@@ -2,16 +2,22 @@ package info.einverne.guesswords.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import java.util.ArrayList;
 
 import info.einverne.guesswords.GameActivity;
+import info.einverne.guesswords.MainActivity;
 import info.einverne.guesswords.R;
+import info.einverne.guesswords.analytics.FAEvent;
+import info.einverne.guesswords.analytics.FAParam;
 import info.einverne.guesswords.data.GroupItem;
 import timber.log.Timber;
 
@@ -41,8 +47,11 @@ public class GroupRecyclerAdapter extends RecyclerView.Adapter<GroupRecyclerAdap
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Timber.d("group item Clicked");
-                startGame(groupItems.get(position).groupId);
+                String groupId = groupItems.get(position).groupId;
+                Bundle param = new Bundle();
+                param.putString(FAParam.GROUP_ID, groupId);
+                FirebaseAnalytics.getInstance(context).logEvent(FAEvent.GROUP_PRESSED, param);
+                startGame(groupId);
             }
         });
     }
