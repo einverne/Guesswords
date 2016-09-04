@@ -24,12 +24,15 @@ import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
+
+import java.util.Random;
 
 import info.einverne.guesswords.analytics.FAEvent;
 import info.einverne.guesswords.analytics.FAParam;
@@ -59,6 +62,7 @@ public class MainActivity extends BaseActivity
     private FrameLayout frameLayout;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private ImageView app_bar_main_image;
+    private LinearLayout nav_header;
 
     // fragment
     private FragmentManager fragmentManager;
@@ -251,6 +255,13 @@ public class MainActivity extends BaseActivity
             });
         }
         navigationView.setCheckedItem(R.id.nav_game_groups);
+        nav_header = (LinearLayout) navHeader.findViewById(R.id.nav_header);
+        int bgStyle = new Random().nextInt(2);
+        if (bgStyle == 0) {
+            nav_header.setBackgroundResource(R.drawable.nav_header_bg1);
+        } else {
+            nav_header.setBackgroundResource(R.drawable.nav_header_bg2);
+        }
     }
 
     @Override
