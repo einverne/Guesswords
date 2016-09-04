@@ -43,7 +43,6 @@ public class BaseActivity extends AppCompatActivity {
         };
 
         database = FirebaseDatabase.getInstance();
-
     }
 
     @Override
