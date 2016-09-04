@@ -55,8 +55,8 @@ public class WordsManager {
 //
 //        writeNewWord("character", "1", "oneword", "word description");
 //
-//        List<Group> list = getAllGroup();
-//        for (Group oneGroup : list) {
+//        List<GroupItem> list = getAllGroup();
+//        for (GroupItem oneGroup : list) {
 //            Timber.d("map key: " + oneGroup.groupId + "value: " + oneGroup.groupName);
 //        }
 
@@ -191,9 +191,9 @@ public class WordsManager {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<String> listGroup = new ArrayList<String>();
-                Group group = new Group(groupId, groupDetail);
+                GroupItem group = new GroupItem(groupId, groupDetail);
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    Group oneGroup = data.getValue(Group.class);
+                    GroupItem oneGroup = data.getValue(GroupItem.class);
                     listGroup.add(oneGroup.groupId);
                 }
                 if (!listGroup.contains(groupId)) {

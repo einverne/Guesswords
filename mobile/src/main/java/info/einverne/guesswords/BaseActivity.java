@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
@@ -17,13 +18,13 @@ import timber.log.Timber;
  * Created by einverne on 8/23/16.
  */
 public class BaseActivity extends AppCompatActivity {
+    public static final String DEVICE_RELATED = "device_related";
 
     protected FirebaseAuth mAuth;
     protected FirebaseAuth.AuthStateListener mAuthListener;
 
     protected FirebaseDatabase database;
-
-    protected SharedPreferences sharedPreferences;
+    public FirebaseAnalytics firebaseAnalytics;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,8 +45,7 @@ public class BaseActivity extends AppCompatActivity {
         };
 
         database = FirebaseDatabase.getInstance();
-
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override
@@ -60,5 +60,29 @@ public class BaseActivity extends AppCompatActivity {
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
+    }
+
+    /**
+     * 获取默认 SharedPreferences
+     *
+     * @return 默认
+     */
+    public SharedPreferences getDefaultSharedPreferences() {
+        return PreferenceManager.getDefaultSharedPreferences(this);
+    }
+
+    /**
+     * 获取设备相关
+     *
+     * @return 设备相关
+     */
+    public SharedPreferences getDeviceSharedPreferences() {
+        return getSharedPreferences(DEVICE_RELATED, MODE_PRIVATE);
+    }
+
+    public void setDeviceSharedPreferences(String key, boolean value) {
+        SharedPreferences.Editor editor = getDeviceSharedPreferences().edit();
+        editor.putBoolean(key, value);
+        editor.apply();
     }
 }
