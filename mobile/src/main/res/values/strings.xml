@@ -44,7 +44,7 @@
     <string name="nav_header_login_before">Click avatar to login</string>
 
     <!-- About -->
-    <string name="about_content">This is a simple game based on personal interest.</string>
+    <string name="about_content">This is a simple game based on personal interest. With the great help of Tian Huahua.</string>
     <string name="data_progress_dialog_message">loading</string>
 
     <!-- Setting -->

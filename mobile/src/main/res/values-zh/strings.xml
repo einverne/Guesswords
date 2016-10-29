@@ -43,7 +43,7 @@
     <string name="nav_header_login_before">点击头像登陆</string>
 
     <!-- About -->
-    <string name="about_content">这是一个基于个人兴趣制作的猜词应用</string>
+    <string name="about_content">这是一个基于个人兴趣制作的猜词应用。并且非常感谢 Tian Huahua 的素材</string>
     <string name="data_progress_dialog_message">加载</string>
 
     <!-- Setting -->
