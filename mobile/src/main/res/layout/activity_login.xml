@@ -112,11 +112,11 @@
                     android:layout_marginTop="10dp"
                     android:background="#443b3535" />
 
-                <Button
-                    android:id="@+id/btn_anonymous_login"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/btn_anonymous_login" />
+                <!--<Button-->
+                    <!--android:id="@+id/btn_anonymous_login"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="@string/btn_anonymous_login" />-->
 
             </LinearLayout>
 
