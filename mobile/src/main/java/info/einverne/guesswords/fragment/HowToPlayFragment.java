@@ -67,17 +67,16 @@ public class HowToPlayFragment extends Fragment {
     private void setUpContent() {
         switch (mPagerIndex) {
             case 0:
-                setImage(R.drawable.ic_media_play);
+                setImage(R.drawable.how_to_play_1);
                 break;
             case 1:
-                setImage(R.drawable.ic_media_play);
+                setImage(R.drawable.how_to_play_2);
                 break;
             case 2:
-                setImage(R.drawable.ic_media_play);
+                setImage(R.drawable.how_to_play_3);
                 break;
-            case 3:
-                setImage(R.drawable.ic_media_play);
-                break;
+            default:
+
         }
     }
 
