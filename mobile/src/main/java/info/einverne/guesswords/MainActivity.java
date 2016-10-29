@@ -268,11 +268,17 @@ public class MainActivity extends BaseActivity
     protected void onResume() {
         super.onResume();
         Timber.d("onResume");
+        if (downloadReceiver != null) {
+            IntentFilter intentFilter = new IntentFilter(DownloadService.BROADCAST_FINISH_ACTION);
+            intentFilter.addAction(DownloadService.BROADCAST_ING_ACTION);
+            downloadReceiver = new DownloadFinishReceiver();
+            LocalBroadcastManager.getInstance(this).registerReceiver(downloadReceiver, intentFilter);
+        }
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if (downloadReceiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(downloadReceiver);
         }

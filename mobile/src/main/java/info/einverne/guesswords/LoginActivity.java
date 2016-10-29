@@ -131,32 +131,32 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         });
 
         // anonymous login
-        Button anonymousButton = (Button) findViewById(R.id.btn_anonymous_login);
-        anonymousButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showProgress(true);
-                mAuth.signInAnonymously()
-                        .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                showProgress(false);
-                                Timber.d("signInAnonymously:onComplete " + task.isSuccessful());
-
-                                // If sign in fails, display a message to the user. If sign in succeeds
-                                // the auth state listener will be notified and logic to handle the
-                                // signed in user can be handled in the listener.
-                                if (!task.isSuccessful()) {
-                                    Timber.w(task.getException(), "signInAnonymously");
-                                    Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
-                                } else {
-                                    finish();
-                                }
-                            }
-                        });
-            }
-        });
+//        Button anonymousButton = (Button) findViewById(R.id.btn_anonymous_login);
+//        anonymousButton.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                showProgress(true);
+//                mAuth.signInAnonymously()
+//                        .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<AuthResult> task) {
+//                                showProgress(false);
+//                                Timber.d("signInAnonymously:onComplete " + task.isSuccessful());
+//
+//                                // If sign in fails, display a message to the user. If sign in succeeds
+//                                // the auth state listener will be notified and logic to handle the
+//                                // signed in user can be handled in the listener.
+//                                if (!task.isSuccessful()) {
+//                                    Timber.w(task.getException(), "signInAnonymously");
+//                                    Toast.makeText(LoginActivity.this, "Authentication failed.",
+//                                            Toast.LENGTH_SHORT).show();
+//                                } else {
+//                                    finish();
+//                                }
+//                            }
+//                        });
+//            }
+//        });
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
